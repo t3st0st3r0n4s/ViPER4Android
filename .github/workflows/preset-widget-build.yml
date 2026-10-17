@@ -26,10 +26,16 @@ jobs:
         run: |
           sed -i '/compileSdk = 37/a\    compileSdkMinor = 2' app/build.gradle.kts
           grep -F 'compileSdkMinor = 2' app/build.gradle.kts
-      - name: Build debug APK
-        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+      - name: Sign minified release test APK with ephemeral debug key
+        run: |
+          sed -i 's/signingConfigs.getByName("release") else null/signingConfigs.getByName("release") else signingConfigs.getByName("debug")/' app/build.gradle.kts
+          grep -F 'else signingConfigs.getByName("debug")' app/build.gradle.kts
+      - name: Build minified release-variant test APK
+        run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
+      - name: Report exact APK byte size
+        run: stat -c 'APK %n %s bytes' app/build/outputs/apk/release/*.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: ViPER4Android-2.1.1-preset-widget-debug
-          path: app/build/outputs/apk/debug/*.apk
+          name: ViPER4Android-2.1.1-preset-widget-release-test
+          path: app/build/outputs/apk/release/*.apk
           if-no-files-found: error

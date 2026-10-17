@@ -70,6 +70,9 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                 var spacing by remember(widgetId) {
                     mutableFloatStateOf((previous?.gapDp ?: 4).toFloat())
                 }
+                var outerInset by remember(widgetId) {
+                    mutableFloatStateOf((previous?.outerInsetDp ?: 0).toFloat())
+                }
 
                 Column(
                     modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
@@ -137,7 +140,10 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             Text("Auto displays horizontally in a wide widget and vertically in a tall widget.")
                         }
                         if (vertical) {
-                            Column(verticalArrangement = Arrangement.spacedBy(spacing.dp)) {
+                            Column(
+                                modifier = Modifier.padding(outerInset.dp),
+                                verticalArrangement = Arrangement.spacedBy(spacing.dp),
+                            ) {
                                 chosen.forEach { id ->
                                     val label = presets.firstOrNull { it.id == id }?.name ?: "Missing preset"
                                     Box(
@@ -156,7 +162,7 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             }
                         } else {
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().padding(outerInset.dp),
                                 horizontalArrangement = Arrangement.spacedBy(spacing.dp),
                             ) {
                                 chosen.forEach { id ->
@@ -177,13 +183,19 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             }
                         }
                     }
-                    Text("Button gap: ${spacing.roundToInt()} dp")
+                    Text("Between buttons: ${spacing.roundToInt()} dp")
                     Slider(
                         value = spacing,
                         onValueChange = { spacing = it },
-                        valueRange = 0f..20f,
-                        steps = 19,
+                        valueRange = 0f..96f,
                     )
+                    Text("Outside inset: ${outerInset.roundToInt()} dp")
+                    Slider(
+                        value = outerInset,
+                        onValueChange = { outerInset = it },
+                        valueRange = 0f..64f,
+                    )
+                    Text("Large spacing needs a wider widget to keep buttons visible.")
                     Button(
                         enabled = chosen.isNotEmpty(),
                         onClick = {
@@ -194,6 +206,7 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                     presets = chosen.map { WidgetPreset(it) },
                                     orientation = orientation,
                                     gapDp = spacing.roundToInt(),
+                                    outerInsetDp = outerInset.roundToInt(),
                                 ),
                             )
                             setResult(

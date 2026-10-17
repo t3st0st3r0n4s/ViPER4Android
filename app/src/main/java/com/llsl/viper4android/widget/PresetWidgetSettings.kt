@@ -10,6 +10,7 @@ data class WidgetConfiguration(
     val presets: List<WidgetPreset>,
     val orientation: String = "horizontal",
     val gapDp: Int = 4,
+    val outerInsetDp: Int = 0,
 )
 
 object PresetWidgetSettings {
@@ -34,7 +35,8 @@ object PresetWidgetSettings {
             WidgetConfiguration(
                 presets = presets,
                 orientation = json.optString("orientation", "horizontal"),
-                gapDp = json.optInt("gapDp", 4).coerceIn(0, 20),
+                gapDp = json.optInt("gapDp", 4).coerceIn(0, 96),
+                outerInsetDp = json.optInt("outerInsetDp", 0).coerceIn(0, 64),
             )
         } catch (_: Exception) {
             null
@@ -50,7 +52,8 @@ object PresetWidgetSettings {
             JSONObject()
                 .put("presets", list)
                 .put("orientation", config.orientation)
-                .put("gapDp", config.gapDp.coerceIn(0, 20))
+                .put("gapDp", config.gapDp.coerceIn(0, 96))
+                .put("outerInsetDp", config.outerInsetDp.coerceIn(0, 64))
         preferences(context).edit().putString("widget_$widgetId", json.toString()).apply()
     }
 

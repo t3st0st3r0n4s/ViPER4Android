@@ -7,7 +7,9 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.util.TypedValue
 import android.widget.RemoteViews
 import com.llsl.viper4android.R
 import com.llsl.viper4android.data.model.Preset
@@ -102,6 +104,15 @@ class PresetWidgetProvider : AppWidgetProvider() {
         val layout = if (vertical) R.layout.widget_presets_vertical else R.layout.widget_presets_horizontal
         val views = RemoteViews(context.packageName, layout)
         views.removeAllViews(R.id.widget_preset_container)
+        val outerInset =
+            ((config?.outerInsetDp ?: 0) * context.resources.displayMetrics.density).toInt()
+        views.setViewPadding(
+            R.id.widget_preset_container,
+            outerInset,
+            outerInset,
+            outerInset,
+            outerInset,
+        )
         val choices = config?.presets.orEmpty()
         if (choices.isEmpty()) {
             val empty = RemoteViews(context.packageName, R.layout.widget_presets_empty)
@@ -122,7 +133,8 @@ class PresetWidgetProvider : AppWidgetProvider() {
             views.addView(R.id.widget_preset_container, empty)
         } else {
             val active = PresetWidgetSettings.activePresetId(context)
-            val gap = (context.resources.displayMetrics.density * (config?.gapDp ?: 4)).toInt()
+            val gapDp = config?.gapDp ?: 4
+            val gapPx = (context.resources.displayMetrics.density * gapDp).toInt()
             choices.forEachIndexed { index, choice ->
                 val preset = presets[choice.id]
                 val itemLayout =
@@ -137,13 +149,26 @@ class PresetWidgetProvider : AppWidgetProvider() {
                     R.id.widget_preset_label,
                     preset?.name ?: "Missing preset",
                 )
-                if (index > 0) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    // Margins participate in LinearLayout weight distribution, so every
+                    // button (including the first) shrinks equally as spacing increases.
+                    if (index > 0) {
+                        item.setViewLayoutMargin(
+                            R.id.widget_preset_item,
+                            if (vertical) RemoteViews.MARGIN_TOP else RemoteViews.MARGIN_LEFT,
+                            gapDp.toFloat(),
+                            TypedValue.COMPLEX_UNIT_DIP,
+                        )
+                    }
+                } else {
+                    // RemoteViews layout-margin actions were added in Android 12.
+                    // Keep a usable symmetric visual gap for supported older devices.
                     item.setViewPadding(
                         R.id.widget_preset_item,
-                        if (vertical) 0 else gap,
-                        if (vertical) gap else 0,
-                        0,
-                        0,
+                        if (vertical || index == 0) 0 else gapPx / 2,
+                        if (!vertical || index == 0) 0 else gapPx / 2,
+                        if (vertical || index == choices.lastIndex) 0 else gapPx / 2,
+                        if (!vertical || index == choices.lastIndex) 0 else gapPx / 2,
                     )
                 }
                 if (preset != null) {
