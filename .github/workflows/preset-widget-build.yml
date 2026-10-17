@@ -20,12 +20,12 @@ jobs:
         with:
           packages: ''
           log-accepted-android-sdk-licenses: 'false'
-      - name: Install available Android SDK 36
-        run: sdkmanager --install 'platforms;android-36' 'build-tools;36.0.0'
-      - name: Use SDK 36 for CI only (upstream SDK 37 unavailable)
+      - name: Install Android SDK 37.2
+        run: sdkmanager --channel=3 --install 'platforms;android-37.2' 'build-tools;37.0.0'
+      - name: Select API 37.2 minor SDK for CI
         run: |
-          sed -i 's/compileSdk = 37/compileSdk = 36/; s/targetSdk = 37/targetSdk = 36/' app/build.gradle.kts
-          grep -F 'compileSdk = 36' app/build.gradle.kts
+          sed -i '/compileSdk = 37/a\    compileSdkMinor = 2' app/build.gradle.kts
+          grep -F 'compileSdkMinor = 2' app/build.gradle.kts
       - name: Build debug APK
         run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
       - uses: actions/upload-artifact@v4
