@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_preset_item"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1">
+    <TextView
+        android:id="@+id/widget_preset_label"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/widget_preset_active"
+        android:gravity="center"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textColor="#FFFFFFFF"
+        android:textSize="13sp"
+        android:padding="4dp" />
+</LinearLayout>
