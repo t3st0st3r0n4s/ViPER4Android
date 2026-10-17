@@ -42,6 +42,15 @@ android {
     }
 
     buildTypes {
+        debug {
+            // CI and on-device test APKs retain debug signing but use R8/resource shrinking.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+        }
         release {
             signingConfig = if (keystoreFile.isNotEmpty()) signingConfigs.getByName("release") else null
             isMinifyEnabled = true

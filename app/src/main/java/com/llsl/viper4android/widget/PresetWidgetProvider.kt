@@ -135,7 +135,7 @@ class PresetWidgetProvider : AppWidgetProvider() {
                 val item = RemoteViews(context.packageName, itemLayout)
                 item.setTextViewText(
                     R.id.widget_preset_label,
-                    choice.label.ifBlank { preset?.name ?: "Missing preset" },
+                    preset?.name ?: "Missing preset",
                 )
                 if (index > 0) {
                     item.setViewPadding(

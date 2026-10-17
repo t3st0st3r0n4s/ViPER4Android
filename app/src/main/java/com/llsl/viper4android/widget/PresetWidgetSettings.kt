@@ -4,7 +4,7 @@ import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
 
-data class WidgetPreset(val id: Long, val label: String = "")
+data class WidgetPreset(val id: Long)
 
 data class WidgetConfiguration(
     val presets: List<WidgetPreset>,
@@ -29,7 +29,7 @@ object PresetWidgetSettings {
                 (0 until list.length()).mapNotNull { index ->
                     val value = list.optJSONObject(index) ?: return@mapNotNull null
                     val id = value.optLong("id", 0L)
-                    if (id <= 0) null else WidgetPreset(id, value.optString("label", ""))
+                    if (id <= 0) null else WidgetPreset(id)
                 }
             WidgetConfiguration(
                 presets = presets,
@@ -44,7 +44,7 @@ object PresetWidgetSettings {
     fun save(context: Context, widgetId: Int, config: WidgetConfiguration) {
         val list = JSONArray()
         config.presets.distinctBy { it.id }.forEach {
-            list.put(JSONObject().put("id", it.id).put("label", it.label))
+            list.put(JSONObject().put("id", it.id))
         }
         val json =
             JSONObject()
