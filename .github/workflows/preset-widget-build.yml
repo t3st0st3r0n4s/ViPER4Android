@@ -1,0 +1,31 @@
+name: Preset widget build
+
+on:
+  push:
+    branches: [feature/preset-widget]
+
+permissions:
+  contents: read
+
+jobs:
+  debug-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: ''
+          log-accepted-android-sdk-licenses: 'false'
+      - name: Install Android SDK 37
+        run: sdkmanager --install 'platforms;android-37' 'build-tools;37.0.0'
+      - name: Build debug APK
+        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ViPER4Android-2.1.1-preset-widget-debug
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
