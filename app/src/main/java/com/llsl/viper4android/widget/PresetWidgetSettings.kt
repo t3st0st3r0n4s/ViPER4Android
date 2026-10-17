@@ -11,7 +11,14 @@ data class WidgetConfiguration(
     val orientation: String = "horizontal",
     val gapDp: Int = 4,
     val outerInsetDp: Int = 0,
+    val textColor: Int = DEFAULT_TEXT_COLOR,
+    val widgetColor: Int = DEFAULT_WIDGET_COLOR,
+    val activeColor: Int = DEFAULT_ACTIVE_COLOR,
 )
+
+const val DEFAULT_TEXT_COLOR: Int = -0x1
+const val DEFAULT_WIDGET_COLOR: Int = 0xFF30343D.toInt()
+const val DEFAULT_ACTIVE_COLOR: Int = 0xFF4068B7.toInt()
 
 object PresetWidgetSettings {
     const val CHANGE_REVISION = "widget_preset_revision"
@@ -37,6 +44,9 @@ object PresetWidgetSettings {
                 orientation = json.optString("orientation", "horizontal"),
                 gapDp = json.optInt("gapDp", 4).coerceIn(0, 96),
                 outerInsetDp = json.optInt("outerInsetDp", 0).coerceIn(0, 64),
+                textColor = json.optInt("textColor", DEFAULT_TEXT_COLOR),
+                widgetColor = json.optInt("widgetColor", DEFAULT_WIDGET_COLOR),
+                activeColor = json.optInt("activeColor", DEFAULT_ACTIVE_COLOR),
             )
         } catch (_: Exception) {
             null
@@ -54,6 +64,9 @@ object PresetWidgetSettings {
                 .put("orientation", config.orientation)
                 .put("gapDp", config.gapDp.coerceIn(0, 96))
                 .put("outerInsetDp", config.outerInsetDp.coerceIn(0, 64))
+                .put("textColor", config.textColor)
+                .put("widgetColor", config.widgetColor)
+                .put("activeColor", config.activeColor)
         preferences(context).edit().putString("widget_$widgetId", json.toString()).apply()
     }
 

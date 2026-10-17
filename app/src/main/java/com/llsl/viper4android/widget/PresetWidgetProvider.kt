@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
+import android.content.res.ColorStateList
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -149,6 +150,20 @@ class PresetWidgetProvider : AppWidgetProvider() {
                     R.id.widget_preset_label,
                     preset?.name ?: "Missing preset",
                 )
+                item.setTextColor(R.id.widget_preset_label, config?.textColor ?: DEFAULT_TEXT_COLOR)
+                val backgroundColor =
+                    if (active == choice.id) config?.activeColor ?: DEFAULT_ACTIVE_COLOR
+                    else config?.widgetColor ?: DEFAULT_WIDGET_COLOR
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    item.setColorStateList(
+                        R.id.widget_preset_label,
+                        "setBackgroundTintList",
+                        ColorStateList.valueOf(backgroundColor),
+                    )
+                } else {
+                    // Android < 12 has no dynamic RemoteViews ColorStateList setter.
+                    item.setInt(R.id.widget_preset_label, "setBackgroundColor", backgroundColor)
+                }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     // Margins participate in LinearLayout weight distribution, so every
                     // button (including the first) shrinks equally as spacing increases.
