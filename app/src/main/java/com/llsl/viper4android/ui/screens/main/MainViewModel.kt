@@ -51,6 +51,8 @@ import com.llsl.viper4android.utils.ReleaseInfo
 import com.llsl.viper4android.utils.UpdateChecker
 import com.llsl.viper4android.utils.UpdateResult
 import com.llsl.viper4android.viper.ParamValue
+import com.llsl.viper4android.widget.PresetWidgetProvider
+import com.llsl.viper4android.widget.PresetWidgetSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -180,6 +182,7 @@ class MainViewModel
         init {
             refreshFileLists()
             observeExternalMasterChanges()
+            observeWidgetPresetChanges()
             val initialDevice = audioOutputDetector.activeDevice.value
             viewModelScope.launch {
                 loadSettingsPreferences()
@@ -224,12 +227,26 @@ class MainViewModel
             }
         }
 
+        private fun observeWidgetPresetChanges() {
+            viewModelScope.launch {
+                repository
+                    .getStringPreference(PresetWidgetSettings.CHANGE_REVISION, "")
+                    .distinctUntilChanged()
+                    .collect { revision ->
+                        if (revision.isNotEmpty()) {
+                            uiState.value = loadEffectStateFromPrefs(repository, uiState.value)
+                        }
+                    }
+            }
+        }
+
         private val persistJobs = mutableMapOf<String, Job>()
 
         fun <T> applyPref(
             pref: EffectPref<T>,
             value: T,
         ) {
+            PresetWidgetSettings.markActive(getApplication(), null)
             uiState.update { pref.set(it, value) }
             if (pref.paramId != -1 && uiState.value.masterEnable && shouldDispatch(pref)) {
                 when (pref) {
@@ -1008,6 +1025,7 @@ class MainViewModel
             uiState.update { deserializeEffectPrefs(json, it) }
             saveEffectPrefs(repository, uiState.value)
             dispatchFullState()
+            PresetWidgetSettings.markActive(getApplication(), null)
         }
 
         fun saveSettingsOnBackground() {
@@ -1408,6 +1426,7 @@ class MainViewModel
                         fos.fd.sync()
                     }
                     FileLogger.i("ViewModel", "savePreset: $name -> ${file.absolutePath}")
+                    PresetWidgetProvider.refreshAll(getApplication())
                 } catch (e: Exception) {
                     FileLogger.e("ViewModel", "savePreset: failed for name=$name", e)
                 }
@@ -1421,6 +1440,7 @@ class MainViewModel
                 uiState.update { deserializeEffectPrefs(json, it) }
                 saveEffectPrefs(repository, uiState.value)
                 dispatchFullState()
+                PresetWidgetSettings.markActive(getApplication(), id)
             }
         }
 
@@ -1428,6 +1448,10 @@ class MainViewModel
             viewModelScope.launch {
                 val preset = repository.getPresetById(id) ?: return@launch
                 repository.deletePresetById(id)
+                PresetWidgetProvider.refreshAll(getApplication())
+                if (PresetWidgetSettings.activePresetId(getApplication()) == id) {
+                    PresetWidgetSettings.markActive(getApplication(), null)
+                }
                 try {
                     File(getFilesDir("Preset"), "${preset.name}.json").delete()
                 } catch (e: Exception) {
@@ -1455,6 +1479,8 @@ class MainViewModel
                     }
                 }
                 repository.deleteAllPresets()
+                PresetWidgetSettings.markActive(getApplication(), null)
+                PresetWidgetProvider.refreshAll(getApplication())
                 if (showProgress) {
                     completeBulkProgress(NOTIFY_ID_PRESET_CLEAR, notificationTitle, "$successStr: $deleted / $total")
                 }
@@ -1471,6 +1497,7 @@ class MainViewModel
                 repository.updatePreset(
                     preset.copy(settingsJson = roomJson, updatedAt = updatedAt),
                 )
+                PresetWidgetProvider.refreshAll(getApplication())
                 try {
                     val file = File(getFilesDir("Preset"), "${preset.name}.json")
                     val fileJson =
@@ -1497,6 +1524,7 @@ class MainViewModel
             viewModelScope.launch {
                 val preset = repository.getPresetById(id) ?: return@launch
                 repository.updatePreset(preset.copy(name = newName))
+                PresetWidgetProvider.refreshAll(getApplication())
                 try {
                     val dir = getFilesDir("Preset")
                     val oldFile = File(dir, "${preset.name}.json")
