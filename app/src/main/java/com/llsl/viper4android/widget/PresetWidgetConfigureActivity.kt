@@ -7,14 +7,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -30,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
@@ -39,15 +36,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.llsl.viper4android.data.repository.ViperRepository
 import com.llsl.viper4android.ui.theme.ViperTheme
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.math.abs
 import kotlin.math.roundToInt
 import javax.inject.Inject
 
@@ -94,7 +86,6 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                     mutableIntStateOf(previous?.activeColor ?: DEFAULT_ACTIVE_COLOR)
                 }
                 var editingColor by remember { mutableStateOf<String?>(null) }
-                var dragging by remember { mutableStateOf<Long?>(null) }
 
                 Scaffold(
                     bottomBar = {
@@ -174,126 +165,23 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                         }
 
                         if (chosen.isNotEmpty()) {
-                            Text("Button order — hold and drag to rearrange", style = MaterialTheme.typography.titleMedium)
-                            chosen.toList().forEachIndexed { index, id ->
-                                key(id) {
-                                    var rowHeightPx by remember { mutableIntStateOf(1) }
-                                    var dragDistance by remember { mutableFloatStateOf(0f) }
-                                    Row(
-                                        modifier =
-                                            Modifier
-                                                .fillMaxWidth()
-                                                .heightIn(min = 52.dp)
-                                                .onSizeChanged { rowHeightPx = it.height }
-                                                .background(
-                                                    if (dragging == id) {
-                                                        MaterialTheme.colorScheme.secondaryContainer
-                                                    } else {
-                                                        MaterialTheme.colorScheme.surfaceVariant
-                                                    },
-                                                    MaterialTheme.shapes.medium,
-                                                ).pointerInput(id) {
-                                                    detectDragGesturesAfterLongPress(
-                                                        onDragStart = {
-                                                            dragging = id
-                                                            dragDistance = 0f
-                                                        },
-                                                        onDragEnd = {
-                                                            dragging = null
-                                                            dragDistance = 0f
-                                                        },
-                                                        onDragCancel = {
-                                                            dragging = null
-                                                            dragDistance = 0f
-                                                        },
-                                                        onDrag = { change, drag ->
-                                                            change.consume()
-                                                            dragDistance += drag.y
-                                                            val threshold = rowHeightPx.coerceAtLeast(1) * 0.7f
-                                                            if (abs(dragDistance) >= threshold) {
-                                                                val from = chosen.indexOf(id)
-                                                                val step = if (dragDistance > 0f) 1 else -1
-                                                                val to = from + step
-                                                                if (from >= 0 && to in chosen.indices) {
-                                                                    chosen.removeAt(from)
-                                                                    chosen.add(to, id)
-                                                                    dragDistance -= step * rowHeightPx
-                                                                } else {
-                                                                    dragDistance = 0f
-                                                                }
-                                                            }
-                                                        },
-                                                    )
-                                                }.padding(horizontal = 12.dp, vertical = 8.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Text(
-                                            "${index + 1}. ${presets.firstOrNull { it.id == id }?.name ?: "Missing preset"}",
-                                            modifier = Modifier.weight(1f),
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                        )
-                                        Text("☰ Drag")
-                                    }
-                                }
-                            }
-
-                            Text("Preview (first button represents active)", style = MaterialTheme.typography.titleMedium)
-                            val vertical = orientation == "vertical"
+                            Text(
+                                "Arrange buttons — long-press and drag in the preview",
+                                style = MaterialTheme.typography.titleMedium,
+                            )
                             if (orientation == "auto") {
                                 Text("Auto uses a horizontal layout when wide, vertical when tall.")
                             }
-                            if (vertical) {
-                                Column(
-                                    modifier = Modifier.padding(outerInset.dp),
-                                    verticalArrangement = Arrangement.spacedBy(spacing.dp),
-                                ) {
-                                    chosen.forEachIndexed { i, id ->
-                                        Box(
-                                            modifier =
-                                                Modifier
-                                                    .fillMaxWidth()
-                                                    .background(
-                                                        Color(if (i == 0) activeColor else widgetColor),
-                                                        MaterialTheme.shapes.medium,
-                                                    ).padding(12.dp),
-                                            contentAlignment = Alignment.Center,
-                                        ) {
-                                            Text(
-                                                presets.firstOrNull { it.id == id }?.name ?: "Missing preset",
-                                                color = Color(textColor),
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis,
-                                            )
-                                        }
-                                    }
-                                }
-                            } else {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth().padding(outerInset.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(spacing.dp),
-                                ) {
-                                    chosen.forEachIndexed { i, id ->
-                                        Box(
-                                            modifier =
-                                                Modifier
-                                                    .weight(1f)
-                                                    .background(
-                                                        Color(if (i == 0) activeColor else widgetColor),
-                                                        MaterialTheme.shapes.medium,
-                                                    ).padding(vertical = 12.dp, horizontal = 2.dp),
-                                            contentAlignment = Alignment.Center,
-                                        ) {
-                                            Text(
-                                                presets.firstOrNull { it.id == id }?.name ?: "Missing preset",
-                                                color = Color(textColor),
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis,
-                                            )
-                                        }
-                                    }
-                                }
-                            }
+                            PresetWidgetPreview(
+                                chosen = chosen,
+                                names = presets.associate { it.id to it.name },
+                                vertical = orientation == "vertical",
+                                gapDp = spacing.roundToInt(),
+                                outerInsetDp = outerInset.roundToInt(),
+                                textColor = textColor,
+                                widgetColor = widgetColor,
+                                activeColor = activeColor,
+                            )
                         }
 
                         Text("Between buttons: ${spacing.roundToInt()} dp")
