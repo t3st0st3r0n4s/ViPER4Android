@@ -81,6 +81,12 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                 var textColor by remember(widgetId) {
                     mutableIntStateOf(previous?.textColor ?: DEFAULT_TEXT_COLOR)
                 }
+                var presetTextSize by remember(widgetId) {
+                    mutableFloatStateOf((previous?.presetTextSizeSp ?: 13).toFloat())
+                }
+                var presetTextWeight by remember(widgetId) {
+                    mutableStateOf(previous?.presetTextWeight ?: "normal")
+                }
                 var activeTextColor by remember(widgetId) {
                     mutableIntStateOf(previous?.activeTextColor ?: DEFAULT_TEXT_COLOR)
                 }
@@ -122,6 +128,8 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                             gapDp = spacing.roundToInt(),
                                             outerInsetDp = outerInset.roundToInt(),
                                             textColor = textColor,
+                                            presetTextSizeSp = presetTextSize.roundToInt(),
+                                            presetTextWeight = presetTextWeight,
                                             activeTextColor = activeTextColor,
                                             identityMode = identityMode,
                                             identityText = identityText.trim().take(18),
@@ -218,6 +226,8 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                 gapDp = spacing.roundToInt(),
                                 outerInsetDp = outerInset.roundToInt(),
                                 textColor = textColor,
+                                textSizeSp = presetTextSize.roundToInt(),
+                                textWeight = presetTextWeight,
                                 activeTextColor = activeTextColor,
                                 widgetColor = widgetColor,
                                 identityMode = identityMode,
@@ -230,6 +240,25 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                         Slider(value = spacing, onValueChange = { spacing = it }, valueRange = 0f..96f)
                         Text("Outside inset: ${outerInset.roundToInt()} dp")
                         Slider(value = outerInset, onValueChange = { outerInset = it }, valueRange = 0f..64f)
+
+                        Text("Preset label", style = MaterialTheme.typography.titleMedium)
+                        Text("Size: ${presetTextSize.roundToInt()} sp")
+                        Slider(
+                            value = presetTextSize,
+                            onValueChange = { presetTextSize = it },
+                            valueRange = 10f..30f,
+                            steps = 19,
+                        )
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            listOf("normal" to "Regular", "medium" to "Medium", "bold" to "Bold")
+                                .forEach { (weight, label) ->
+                                    FilterChip(
+                                        selected = presetTextWeight == weight,
+                                        onClick = { presetTextWeight = weight },
+                                        label = { Text(label) },
+                                    )
+                                }
+                        }
 
                         Text("Colours", style = MaterialTheme.typography.titleMedium)
                         WidgetColorSetting("Text (inactive)", textColor) { editingColor = "Text" }

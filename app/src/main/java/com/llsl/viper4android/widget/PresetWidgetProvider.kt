@@ -5,6 +5,11 @@ import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.res.ColorStateList
+import android.graphics.Typeface
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.StyleSpan
+import android.text.style.TypefaceSpan
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -147,9 +152,25 @@ class PresetWidgetProvider : AppWidgetProvider() {
                         else -> R.layout.widget_preset_item_horizontal_inactive
                     }
                 val item = RemoteViews(context.packageName, itemLayout)
-                item.setTextViewText(
+                val presetName = preset?.name ?: "Missing preset"
+                val styledName = SpannableString(presetName)
+                if (presetName.isNotEmpty()) {
+                    when (config?.presetTextWeight) {
+                        "medium" -> styledName.setSpan(
+                            TypefaceSpan("sans-serif-medium"),
+                            0, presetName.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                        )
+                        "bold" -> styledName.setSpan(
+                            StyleSpan(Typeface.BOLD),
+                            0, presetName.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                        )
+                    }
+                }
+                item.setTextViewText(R.id.widget_preset_label, styledName)
+                item.setTextViewTextSize(
                     R.id.widget_preset_label,
-                    preset?.name ?: "Missing preset",
+                    TypedValue.COMPLEX_UNIT_SP,
+                    (config?.presetTextSizeSp ?: 13).toFloat(),
                 )
                 val labelColor =
                     if (active == choice.id) config?.activeTextColor ?: DEFAULT_TEXT_COLOR

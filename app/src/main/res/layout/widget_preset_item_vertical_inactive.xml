@@ -19,8 +19,8 @@
         android:textSize="13sp"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
-        android:paddingTop="14dp"
-        android:paddingBottom="2dp" />
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp" />
         <TextView
             android:id="@+id/widget_identity"
             android:layout_width="wrap_content"

@@ -12,6 +12,8 @@ data class WidgetConfiguration(
     val gapDp: Int = 4,
     val outerInsetDp: Int = 0,
     val textColor: Int = DEFAULT_TEXT_COLOR,
+    val presetTextSizeSp: Int = 13,
+    val presetTextWeight: String = "normal",
     val activeTextColor: Int = DEFAULT_TEXT_COLOR,
     val identityMode: String = "viper",
     val identityText: String = "",
@@ -48,6 +50,9 @@ object PresetWidgetSettings {
                 gapDp = json.optInt("gapDp", 4).coerceIn(0, 96),
                 outerInsetDp = json.optInt("outerInsetDp", 0).coerceIn(0, 64),
                 textColor = json.optInt("textColor", DEFAULT_TEXT_COLOR),
+                presetTextSizeSp = json.optInt("presetTextSizeSp", 13).coerceIn(10, 30),
+                presetTextWeight = json.optString("presetTextWeight", "normal")
+                    .takeIf { it in setOf("normal", "medium", "bold") } ?: "normal",
                 activeTextColor = json.optInt("activeTextColor", DEFAULT_TEXT_COLOR),
                 identityMode = json.optString("identityMode", "viper").takeIf { it in setOf("viper", "custom") } ?: "viper",
                 identityText = json.optString("identityText", "").take(18),
@@ -71,6 +76,8 @@ object PresetWidgetSettings {
                 .put("gapDp", config.gapDp.coerceIn(0, 96))
                 .put("outerInsetDp", config.outerInsetDp.coerceIn(0, 64))
                 .put("textColor", config.textColor)
+                .put("presetTextSizeSp", config.presetTextSizeSp.coerceIn(10, 30))
+                .put("presetTextWeight", config.presetTextWeight)
                 .put("activeTextColor", config.activeTextColor)
                 .put("identityMode", config.identityMode)
                 .put("identityText", config.identityText.take(18))

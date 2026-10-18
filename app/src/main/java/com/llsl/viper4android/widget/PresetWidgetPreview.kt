@@ -25,6 +25,8 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
@@ -44,6 +46,8 @@ fun PresetWidgetPreview(
     gapDp: Int,
     outerInsetDp: Int,
     textColor: Int,
+    textSizeSp: Int,
+    textWeight: String,
     activeTextColor: Int,
     widgetColor: Int,
     activeColor: Int,
@@ -66,6 +70,8 @@ fun PresetWidgetPreview(
                         vertical = true,
                         gapDp = gapDp,
                         textColor = if (index == 0) activeTextColor else textColor,
+                        textSizeSp = textSizeSp,
+                        textWeight = textWeight,
                         backgroundColor = if (index == 0) activeColor else widgetColor,
                         identity = if (identityMode == "custom") identityText.trim() else "ViPER",
                         modifier = Modifier.fillMaxWidth(),
@@ -87,6 +93,8 @@ fun PresetWidgetPreview(
                         vertical = false,
                         gapDp = gapDp,
                         textColor = if (index == 0) activeTextColor else textColor,
+                        textSizeSp = textSizeSp,
+                        textWeight = textWeight,
                         backgroundColor = if (index == 0) activeColor else widgetColor,
                         identity = if (identityMode == "custom") identityText.trim() else "ViPER",
                         modifier = Modifier.weight(1f),
@@ -105,6 +113,8 @@ private fun PreviewPresetButton(
     vertical: Boolean,
     gapDp: Int,
     textColor: Int,
+    textSizeSp: Int,
+    textWeight: String,
     backgroundColor: Int,
     identity: String,
     modifier: Modifier,
@@ -168,8 +178,14 @@ private fun PreviewPresetButton(
     ) {
         Text(
             label,
-            modifier = Modifier.padding(top = 12.dp, bottom = 2.dp, start = 4.dp, end = 4.dp),
+            modifier = Modifier.padding(vertical = 4.dp, horizontal = 4.dp),
             color = Color(textColor),
+            fontSize = textSizeSp.sp,
+            fontWeight = when (textWeight) {
+                "medium" -> FontWeight.Medium
+                "bold" -> FontWeight.Bold
+                else -> FontWeight.Normal
+            },
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
