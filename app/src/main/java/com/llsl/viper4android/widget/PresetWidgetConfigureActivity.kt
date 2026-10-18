@@ -22,6 +22,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -80,6 +81,15 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                 var textColor by remember(widgetId) {
                     mutableIntStateOf(previous?.textColor ?: DEFAULT_TEXT_COLOR)
                 }
+                var activeTextColor by remember(widgetId) {
+                    mutableIntStateOf(previous?.activeTextColor ?: DEFAULT_TEXT_COLOR)
+                }
+                var identityMode by remember(widgetId) {
+                    mutableStateOf(previous?.identityMode ?: "viper")
+                }
+                var identityText by remember(widgetId) {
+                    mutableStateOf(previous?.identityText ?: "")
+                }
                 var widgetColor by remember(widgetId) {
                     mutableIntStateOf(previous?.widgetColor ?: DEFAULT_WIDGET_COLOR)
                 }
@@ -112,6 +122,9 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                             gapDp = spacing.roundToInt(),
                                             outerInsetDp = outerInset.roundToInt(),
                                             textColor = textColor,
+                                            activeTextColor = activeTextColor,
+                                            identityMode = identityMode,
+                                            identityText = identityText.trim().take(18),
                                             widgetColor = widgetColor,
                                             activeColor = activeColor,
                                         ),
@@ -165,6 +178,32 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             }
                         }
 
+                        Text("Widget identity (inside buttons)", style = MaterialTheme.typography.titleMedium)
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            listOf(
+                                "viper" to "ViPER",
+                                "custom" to "Custom",
+                                "none" to "None",
+                            ).forEach { (mode, label) ->
+                                FilterChip(
+                                    selected = identityMode == mode,
+                                    onClick = { identityMode = mode },
+                                    label = { Text(label) },
+                                )
+                            }
+                        }
+                        if (identityMode == "custom") {
+                            OutlinedTextField(
+                                value = identityText,
+                                onValueChange = { identityText = it.replace("\n", " ").take(18) },
+                                modifier = Modifier.fillMaxWidth(),
+                                label = { Text("Button identity") },
+                                placeholder = { Text("e.g. Headphones") },
+                                singleLine = true,
+                                supportingText = { Text("Small label inside each button") },
+                            )
+                        }
+
                         if (chosen.isNotEmpty()) {
                             Text(
                                 "Arrange buttons — long-press and drag in the preview",
@@ -180,7 +219,10 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                 gapDp = spacing.roundToInt(),
                                 outerInsetDp = outerInset.roundToInt(),
                                 textColor = textColor,
+                                activeTextColor = activeTextColor,
                                 widgetColor = widgetColor,
+                                identityMode = identityMode,
+                                identityText = identityText,
                                 activeColor = activeColor,
                             )
                         }
@@ -191,7 +233,8 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                         Slider(value = outerInset, onValueChange = { outerInset = it }, valueRange = 0f..64f)
 
                         Text("Colours", style = MaterialTheme.typography.titleMedium)
-                        WidgetColorSetting("Text", textColor) { editingColor = "Text" }
+                        WidgetColorSetting("Text (inactive)", textColor) { editingColor = "Text" }
+                        WidgetColorSetting("Text (active)", activeTextColor) { editingColor = "Active text" }
                         WidgetColorSetting("Widget (inactive)", widgetColor) { editingColor = "Widget" }
                         WidgetColorSetting("Active preset", activeColor) { editingColor = "Active" }
                     }
@@ -205,6 +248,7 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             initialColor =
                                 when (title) {
                                     "Text" -> textColor
+                                    "Active text" -> activeTextColor
                                     "Widget" -> widgetColor
                                     else -> activeColor
                                 },
@@ -212,6 +256,7 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             onSelect = { selected ->
                                 when (title) {
                                     "Text" -> textColor = selected
+                                    "Active text" -> activeTextColor = selected
                                     "Widget" -> widgetColor = selected
                                     else -> activeColor = selected
                                 }
