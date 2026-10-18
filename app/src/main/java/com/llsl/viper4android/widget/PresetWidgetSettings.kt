@@ -52,7 +52,7 @@ object PresetWidgetSettings {
                 textColor = json.optInt("textColor", DEFAULT_TEXT_COLOR),
                 presetTextSizeSp = json.optInt("presetTextSizeSp", 13).coerceIn(10, 30),
                 presetTextWeight = json.optString("presetTextWeight", "normal")
-                    .takeIf { it in setOf("normal", "medium", "bold") } ?: "normal",
+                    .takeIf { it in setOf("normal", "bold") } ?: "normal",
                 activeTextColor = json.optInt("activeTextColor", DEFAULT_TEXT_COLOR),
                 identityMode = json.optString("identityMode", "viper").takeIf { it in setOf("viper", "custom") } ?: "viper",
                 identityText = json.optString("identityText", "").take(18),

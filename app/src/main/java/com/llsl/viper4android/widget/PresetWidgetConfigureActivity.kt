@@ -250,7 +250,7 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             steps = 19,
                         )
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            listOf("normal" to "Regular", "medium" to "Medium", "bold" to "Bold")
+                            listOf("normal" to "Regular", "bold" to "Bold")
                                 .forEach { (weight, label) ->
                                     FilterChip(
                                         selected = presetTextWeight == weight,

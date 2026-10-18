@@ -182,7 +182,6 @@ private fun PreviewPresetButton(
             color = Color(textColor),
             fontSize = textSizeSp.sp,
             fontWeight = when (textWeight) {
-                "medium" -> FontWeight.Medium
                 "bold" -> FontWeight.Bold
                 else -> FontWeight.Normal
             },

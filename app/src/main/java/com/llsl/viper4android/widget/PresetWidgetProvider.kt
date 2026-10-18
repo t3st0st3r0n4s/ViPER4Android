@@ -9,7 +9,6 @@ import android.graphics.Typeface
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
-import android.text.style.TypefaceSpan
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -156,10 +155,6 @@ class PresetWidgetProvider : AppWidgetProvider() {
                 val styledName = SpannableString(presetName)
                 if (presetName.isNotEmpty()) {
                     when (config?.presetTextWeight) {
-                        "medium" -> styledName.setSpan(
-                            TypefaceSpan("sans-serif-medium"),
-                            0, presetName.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-                        )
                         "bold" -> styledName.setSpan(
                             StyleSpan(Typeface.BOLD),
                             0, presetName.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
