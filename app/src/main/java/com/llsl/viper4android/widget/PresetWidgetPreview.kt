@@ -1,5 +1,7 @@
 package com.llsl.viper4android.widget
 
+import android.view.HapticFeedbackConstants
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
@@ -27,8 +29,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import kotlin.math.abs
 
@@ -40,8 +44,11 @@ fun PresetWidgetPreview(
     gapDp: Int,
     outerInsetDp: Int,
     textColor: Int,
+    activeTextColor: Int,
     widgetColor: Int,
     activeColor: Int,
+    identityMode: String,
+    identityText: String,
 ) {
     // One preview is also the ordering control: no separate duplicate preset list.
     val entries = chosen.toList()
@@ -58,8 +65,13 @@ fun PresetWidgetPreview(
                         chosen = chosen,
                         vertical = true,
                         gapDp = gapDp,
-                        textColor = textColor,
+                        textColor = if (index == 0) activeTextColor else textColor,
                         backgroundColor = if (index == 0) activeColor else widgetColor,
+                        identity = when (identityMode) {
+                            "none" -> ""
+                            "custom" -> identityText.ifBlank { "ViPER" }
+                            else -> "ViPER"
+                        },
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -78,8 +90,13 @@ fun PresetWidgetPreview(
                         chosen = chosen,
                         vertical = false,
                         gapDp = gapDp,
-                        textColor = textColor,
+                        textColor = if (index == 0) activeTextColor else textColor,
                         backgroundColor = if (index == 0) activeColor else widgetColor,
+                        identity = when (identityMode) {
+                            "none" -> ""
+                            "custom" -> identityText.ifBlank { "ViPER" }
+                            else -> "ViPER"
+                        },
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -97,12 +114,14 @@ private fun PreviewPresetButton(
     gapDp: Int,
     textColor: Int,
     backgroundColor: Int,
+    identity: String,
     modifier: Modifier,
 ) {
     var dimensionPx by remember { mutableIntStateOf(1) }
     var dragPx by remember { mutableFloatStateOf(0f) }
     var dragging by remember { mutableStateOf(false) }
     val spacingPx = with(LocalDensity.current) { gapDp.dp.toPx() }
+    val view = LocalView.current
 
     Box(
         modifier =
@@ -120,6 +139,7 @@ private fun PreviewPresetButton(
                         onDragStart = {
                             dragging = true
                             dragPx = 0f
+                            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                         },
                         onDragEnd = {
                             dragging = false
@@ -141,6 +161,7 @@ private fun PreviewPresetButton(
                                     chosen.removeAt(from)
                                     chosen.add(to, id)
                                     dragPx -= step * extent
+                                    view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
                                 } else {
                                     dragPx = 0f
                                 }
@@ -150,14 +171,25 @@ private fun PreviewPresetButton(
                 }.background(
                     Color(backgroundColor),
                     MaterialTheme.shapes.medium,
-                ).padding(vertical = 14.dp, horizontal = 4.dp),
+                ),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             label,
+            modifier = Modifier.padding(top = 12.dp, bottom = 2.dp, start = 4.dp, end = 4.dp),
             color = Color(textColor),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
+        if (identity.isNotBlank()) {
+            Text(
+                identity,
+                modifier = Modifier.align(Alignment.TopStart).padding(start = 6.dp, top = 2.dp),
+                color = Color(textColor),
+                fontSize = 9.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
