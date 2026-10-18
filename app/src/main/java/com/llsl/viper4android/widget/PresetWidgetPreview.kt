@@ -67,11 +67,7 @@ fun PresetWidgetPreview(
                         gapDp = gapDp,
                         textColor = if (index == 0) activeTextColor else textColor,
                         backgroundColor = if (index == 0) activeColor else widgetColor,
-                        identity = when (identityMode) {
-                            "none" -> ""
-                            "custom" -> identityText.ifBlank { "ViPER" }
-                            else -> "ViPER"
-                        },
+                        identity = if (identityMode == "custom") identityText.trim() else "ViPER",
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -92,11 +88,7 @@ fun PresetWidgetPreview(
                         gapDp = gapDp,
                         textColor = if (index == 0) activeTextColor else textColor,
                         backgroundColor = if (index == 0) activeColor else widgetColor,
-                        identity = when (identityMode) {
-                            "none" -> ""
-                            "custom" -> identityText.ifBlank { "ViPER" }
-                            else -> "ViPER"
-                        },
+                        identity = if (identityMode == "custom") identityText.trim() else "ViPER",
                         modifier = Modifier.weight(1f),
                     )
                 }

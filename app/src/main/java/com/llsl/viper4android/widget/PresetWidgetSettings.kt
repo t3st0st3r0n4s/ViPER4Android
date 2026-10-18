@@ -49,7 +49,7 @@ object PresetWidgetSettings {
                 outerInsetDp = json.optInt("outerInsetDp", 0).coerceIn(0, 64),
                 textColor = json.optInt("textColor", DEFAULT_TEXT_COLOR),
                 activeTextColor = json.optInt("activeTextColor", DEFAULT_TEXT_COLOR),
-                identityMode = json.optString("identityMode", "viper").takeIf { it in setOf("viper", "custom", "none") } ?: "viper",
+                identityMode = json.optString("identityMode", "viper").takeIf { it in setOf("viper", "custom") } ?: "viper",
                 identityText = json.optString("identityText", "").take(18),
                 widgetColor = json.optInt("widgetColor", DEFAULT_WIDGET_COLOR),
                 activeColor = json.optInt("activeColor", DEFAULT_ACTIVE_COLOR),

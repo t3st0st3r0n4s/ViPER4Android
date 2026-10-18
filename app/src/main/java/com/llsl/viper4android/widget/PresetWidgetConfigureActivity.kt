@@ -183,7 +183,6 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             listOf(
                                 "viper" to "ViPER",
                                 "custom" to "Custom",
-                                "none" to "None",
                             ).forEach { (mode, label) ->
                                 FilterChip(
                                     selected = identityMode == mode,
@@ -200,7 +199,7 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                 label = { Text("Button identity") },
                                 placeholder = { Text("e.g. Headphones") },
                                 singleLine = true,
-                                supportingText = { Text("Small label inside each button") },
+                                supportingText = { Text("Leave empty to hide the identity label") },
                             )
                         }
 

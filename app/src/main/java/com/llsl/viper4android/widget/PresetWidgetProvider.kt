@@ -156,11 +156,7 @@ class PresetWidgetProvider : AppWidgetProvider() {
                     else config?.textColor ?: DEFAULT_TEXT_COLOR
                 item.setTextColor(R.id.widget_preset_label, labelColor)
                 val identity =
-                    when (config?.identityMode) {
-                        "none" -> ""
-                        "custom" -> config.identityText.ifBlank { "ViPER" }
-                        else -> "ViPER"
-                    }
+                    if (config?.identityMode == "custom") config.identityText.trim() else "ViPER"
                 item.setTextViewText(R.id.widget_identity, identity)
                 item.setTextColor(R.id.widget_identity, labelColor)
                 item.setViewVisibility(
