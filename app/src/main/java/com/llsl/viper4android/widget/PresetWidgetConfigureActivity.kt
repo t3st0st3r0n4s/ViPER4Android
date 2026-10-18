@@ -18,15 +18,24 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AspectRatio
+import androidx.compose.material.icons.filled.Badge
+import androidx.compose.material.icons.filled.DragIndicator
+import androidx.compose.material.icons.filled.LibraryMusic
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -38,10 +47,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.size
 import com.llsl.viper4android.data.repository.ViperRepository
 import com.llsl.viper4android.ui.components.DialogCard
-import com.llsl.viper4android.ui.components.DialogSectionLabel
 import com.llsl.viper4android.ui.theme.ViperTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.roundToInt
@@ -161,10 +172,9 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                     ) {
                         Text("Preset widget", style = MaterialTheme.typography.titleLarge)
 
-                        DialogSectionLabel(label = "Presets")
-                        DialogCard {
+                        WidgetSettingsGroup(title = "Presets", icon = Icons.Default.LibraryMusic) {
                             Column(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                                 verticalArrangement = Arrangement.spacedBy(10.dp),
                             ) {
                                 Text("Select which saved presets appear on this widget.")
@@ -186,10 +196,9 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             }
                         }
 
-                        DialogSectionLabel(label = "Layout")
-                        DialogCard {
+                        WidgetSettingsGroup(title = "Layout", icon = Icons.Default.AspectRatio) {
                             Column(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                                 verticalArrangement = Arrangement.spacedBy(10.dp),
                             ) {
                                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -204,10 +213,9 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             }
                         }
 
-                        DialogSectionLabel(label = "Widget identity (inside buttons)")
-                        DialogCard {
+                        WidgetSettingsGroup(title = "Widget identity (inside buttons)", icon = Icons.Default.Badge) {
                             Column(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                                 verticalArrangement = Arrangement.spacedBy(10.dp),
                             ) {
                                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -236,10 +244,9 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             }
                         }
 
-                        DialogSectionLabel(label = "Buttons & spacing")
-                        DialogCard {
+                        WidgetSettingsGroup(title = "Buttons & spacing", icon = Icons.Default.DragIndicator) {
                             Column(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                                 verticalArrangement = Arrangement.spacedBy(10.dp),
                             ) {
                                 if (chosen.isNotEmpty()) {
@@ -271,10 +278,9 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             }
                         }
 
-                        DialogSectionLabel(label = "Preset label")
-                        DialogCard {
+                        WidgetSettingsGroup(title = "Preset label", icon = Icons.Default.TextFields) {
                             Column(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                                 verticalArrangement = Arrangement.spacedBy(10.dp),
                             ) {
                                 Text("Size: ${presetTextSize.roundToInt()} sp")
@@ -297,10 +303,9 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             }
                         }
 
-                        DialogSectionLabel(label = "Colours")
-                        DialogCard {
+                        WidgetSettingsGroup(title = "Colours", icon = Icons.Default.Palette) {
                             Column(
-                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                                 verticalArrangement = Arrangement.spacedBy(10.dp),
                             ) {
                                 WidgetColorSetting("Text (inactive)", textColor) { editingColor = "Text" }
@@ -346,9 +351,14 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             },
                             preview = { picked ->
                                 WidgetPickerLivePreview(
-                                    presetLabels = chosen.take(2).map { id ->
+                                    presetLabels = chosen.map { id ->
                                         presets.firstOrNull { it.id == id }?.name ?: "Missing preset"
                                     },
+                                    orientation = orientation,
+                                    gapDp = spacing.roundToInt(),
+                                    outerInsetDp = outerInset.roundToInt(),
+                                    textSizeSp = presetTextSize.roundToInt(),
+                                    textWeight = presetTextWeight,
                                     identity = if (identityMode == "custom") identityText.trim() else "ViPER",
                                     inactiveText = if (title == "Text") picked else textColor,
                                     activeText = if (title == "Active text") picked else activeTextColor,
@@ -361,5 +371,34 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun WidgetSettingsGroup(
+    title: String,
+    icon: ImageVector,
+    content: @Composable () -> Unit,
+) {
+    DialogCard {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        content()
     }
 }

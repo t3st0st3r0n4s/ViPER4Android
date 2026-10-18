@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
 import java.util.Locale
 import kotlin.math.ceil
 import kotlin.math.roundToInt
@@ -91,30 +92,102 @@ private fun CheckerboardSwatch(color: Int, modifier: Modifier = Modifier) {
 @Composable
 fun WidgetPickerLivePreview(
     presetLabels: List<String>,
+    orientation: String,
+    gapDp: Int,
+    outerInsetDp: Int,
+    textSizeSp: Int,
+    textWeight: String,
     identity: String,
     inactiveText: Int,
     activeText: Int,
     inactiveBackground: Int,
     activeBackground: Int,
 ) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        presetLabels.take(2).ifEmpty { listOf("ON", "BASS") }.forEachIndexed { index, name ->
-            val fg = if (index == 0) activeText else inactiveText
-            Box(Modifier.weight(1f).height(52.dp)) {
-                CheckerboardSwatch(if (index == 0) activeBackground else inactiveBackground, Modifier.matchParentSize())
-                Text(
-                    name,
-                    modifier = Modifier.align(Alignment.Center).padding(top = 9.dp, start = 4.dp, end = 4.dp),
-                    color = Color(fg), maxLines = 1, overflow = TextOverflow.Ellipsis,
+    if (presetLabels.isEmpty()) {
+        Text("Select a preset to preview")
+        return
+    }
+
+    // Match the configuration preview: Auto is shown horizontally until the host sizes it.
+    val vertical = orientation == "vertical"
+    if (vertical) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(outerInsetDp.dp),
+            verticalArrangement = Arrangement.spacedBy(gapDp.dp),
+        ) {
+            presetLabels.forEachIndexed { index, name ->
+                WidgetPickerPreviewButton(
+                    name = name,
+                    active = index == 0,
+                    identity = identity,
+                    textSizeSp = textSizeSp,
+                    textWeight = textWeight,
+                    inactiveText = inactiveText,
+                    activeText = activeText,
+                    inactiveBackground = inactiveBackground,
+                    activeBackground = activeBackground,
+                    modifier = Modifier.fillMaxWidth(),
                 )
-                if (identity.isNotBlank()) {
-                    Text(
-                        identity,
-                        modifier = Modifier.align(Alignment.TopStart).padding(start = 6.dp, top = 2.dp),
-                        fontSize = 9.sp, color = Color(fg), maxLines = 1,
-                    )
-                }
             }
+        }
+    } else {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(outerInsetDp.dp),
+            horizontalArrangement = Arrangement.spacedBy(gapDp.dp),
+        ) {
+            presetLabels.forEachIndexed { index, name ->
+                WidgetPickerPreviewButton(
+                    name = name,
+                    active = index == 0,
+                    identity = identity,
+                    textSizeSp = textSizeSp,
+                    textWeight = textWeight,
+                    inactiveText = inactiveText,
+                    activeText = activeText,
+                    inactiveBackground = inactiveBackground,
+                    activeBackground = activeBackground,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun WidgetPickerPreviewButton(
+    name: String,
+    active: Boolean,
+    identity: String,
+    textSizeSp: Int,
+    textWeight: String,
+    inactiveText: Int,
+    activeText: Int,
+    inactiveBackground: Int,
+    activeBackground: Int,
+    modifier: Modifier,
+) {
+    val foreground = if (active) activeText else inactiveText
+    val background = if (active) activeBackground else inactiveBackground
+    Box(modifier.heightIn(min = 56.dp)) {
+        CheckerboardSwatch(background, Modifier.matchParentSize())
+        Text(
+            name,
+            modifier = Modifier.align(Alignment.Center).padding(vertical = 4.dp, horizontal = 4.dp),
+            fontSize = textSizeSp.sp,
+            fontWeight = if (textWeight == "bold") FontWeight.Bold else FontWeight.Normal,
+            color = Color(foreground),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        if (identity.isNotBlank()) {
+            Text(
+                identity,
+                modifier = Modifier.align(Alignment.TopStart).padding(start = 6.dp, top = 2.dp),
+                fontSize = 9.sp,
+                color = Color(foreground),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
