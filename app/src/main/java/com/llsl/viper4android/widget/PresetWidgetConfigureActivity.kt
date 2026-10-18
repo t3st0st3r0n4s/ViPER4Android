@@ -40,6 +40,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.llsl.viper4android.data.repository.ViperRepository
+import com.llsl.viper4android.ui.components.DialogCard
+import com.llsl.viper4android.ui.components.DialogSectionLabel
 import com.llsl.viper4android.ui.theme.ViperTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.math.roundToInt
@@ -158,113 +160,155 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.spacedBy(10.dp),
                     ) {
                         Text("Preset widget", style = MaterialTheme.typography.titleLarge)
-                        Text("Select which saved presets appear on this widget.")
-                        presets.forEach { preset ->
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
+
+                        DialogSectionLabel(label = "Presets")
+                        DialogCard {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp),
                             ) {
-                                Checkbox(
-                                    checked = preset.id in chosen,
-                                    onCheckedChange = { selected ->
-                                        if (selected && preset.id !in chosen) chosen.add(preset.id)
-                                        if (!selected) chosen.remove(preset.id)
-                                    },
-                                )
-                                Text(preset.name)
+                                Text("Select which saved presets appear on this widget.")
+                                presets.forEach { preset ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Checkbox(
+                                            checked = preset.id in chosen,
+                                            onCheckedChange = { selected ->
+                                                if (selected && preset.id !in chosen) chosen.add(preset.id)
+                                                if (!selected) chosen.remove(preset.id)
+                                            },
+                                        )
+                                        Text(preset.name)
+                                    }
+                                }
                             }
                         }
 
-                        Text("Layout", style = MaterialTheme.typography.titleMedium)
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            listOf("horizontal", "vertical", "auto").forEach { option ->
-                                FilterChip(
-                                    selected = orientation == option,
-                                    onClick = { orientation = option },
-                                    label = { Text(option.replaceFirstChar { it.uppercase() }) },
-                                )
+                        DialogSectionLabel(label = "Layout")
+                        DialogCard {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp),
+                            ) {
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    listOf("horizontal", "vertical", "auto").forEach { option ->
+                                        FilterChip(
+                                            selected = orientation == option,
+                                            onClick = { orientation = option },
+                                            label = { Text(option.replaceFirstChar { it.uppercase() }) },
+                                        )
+                                    }
+                                }
                             }
                         }
 
-                        Text("Widget identity (inside buttons)", style = MaterialTheme.typography.titleMedium)
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            listOf(
-                                "viper" to "ViPER",
-                                "custom" to "Custom",
-                            ).forEach { (mode, label) ->
-                                FilterChip(
-                                    selected = identityMode == mode,
-                                    onClick = { identityMode = mode },
-                                    label = { Text(label) },
-                                )
-                            }
-                        }
-                        if (identityMode == "custom") {
-                            OutlinedTextField(
-                                value = identityText,
-                                onValueChange = { identityText = it.replace("\n", " ").take(18) },
-                                modifier = Modifier.fillMaxWidth(),
-                                label = { Text("Button identity") },
-                                placeholder = { Text("e.g. Headphones") },
-                                singleLine = true,
-                                supportingText = { Text("Leave empty to hide the identity label") },
-                            )
-                        }
-
-                        if (chosen.isNotEmpty()) {
-                            Text(
-                                "Arrange buttons — long-press and drag in the preview",
-                                style = MaterialTheme.typography.titleMedium,
-                            )
-                            if (orientation == "auto") {
-                                Text("Auto uses a horizontal layout when wide, vertical when tall.")
-                            }
-                            PresetWidgetPreview(
-                                chosen = chosen,
-                                names = presets.associate { it.id to it.name },
-                                vertical = orientation == "vertical",
-                                gapDp = spacing.roundToInt(),
-                                outerInsetDp = outerInset.roundToInt(),
-                                textColor = textColor,
-                                textSizeSp = presetTextSize.roundToInt(),
-                                textWeight = presetTextWeight,
-                                activeTextColor = activeTextColor,
-                                widgetColor = widgetColor,
-                                identityMode = identityMode,
-                                identityText = identityText,
-                                activeColor = activeColor,
-                            )
-                        }
-
-                        Text("Between buttons: ${spacing.roundToInt()} dp")
-                        Slider(value = spacing, onValueChange = { spacing = it }, valueRange = 0f..96f)
-                        Text("Outside inset: ${outerInset.roundToInt()} dp")
-                        Slider(value = outerInset, onValueChange = { outerInset = it }, valueRange = 0f..64f)
-
-                        Text("Preset label", style = MaterialTheme.typography.titleMedium)
-                        Text("Size: ${presetTextSize.roundToInt()} sp")
-                        Slider(
-                            value = presetTextSize,
-                            onValueChange = { presetTextSize = it },
-                            valueRange = 10f..30f,
-                            steps = 19,
-                        )
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            listOf("normal" to "Regular", "bold" to "Bold")
-                                .forEach { (weight, label) ->
-                                    FilterChip(
-                                        selected = presetTextWeight == weight,
-                                        onClick = { presetTextWeight = weight },
-                                        label = { Text(label) },
+                        DialogSectionLabel(label = "Widget identity (inside buttons)")
+                        DialogCard {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp),
+                            ) {
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    listOf(
+                                        "viper" to "ViPER",
+                                        "custom" to "Custom",
+                                    ).forEach { (mode, label) ->
+                                        FilterChip(
+                                            selected = identityMode == mode,
+                                            onClick = { identityMode = mode },
+                                            label = { Text(label) },
+                                        )
+                                    }
+                                }
+                                if (identityMode == "custom") {
+                                    OutlinedTextField(
+                                        value = identityText,
+                                        onValueChange = { identityText = it.replace("\n", " ").take(18) },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        label = { Text("Button identity") },
+                                        placeholder = { Text("e.g. Headphones") },
+                                        singleLine = true,
+                                        supportingText = { Text("Leave empty to hide the identity label") },
                                     )
                                 }
+                            }
                         }
 
-                        Text("Colours", style = MaterialTheme.typography.titleMedium)
-                        WidgetColorSetting("Text (inactive)", textColor) { editingColor = "Text" }
-                        WidgetColorSetting("Text (active)", activeTextColor) { editingColor = "Active text" }
-                        WidgetColorSetting("Widget (inactive)", widgetColor) { editingColor = "Widget" }
-                        WidgetColorSetting("Active preset", activeColor) { editingColor = "Active" }
+                        DialogSectionLabel(label = "Buttons & spacing")
+                        DialogCard {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp),
+                            ) {
+                                if (chosen.isNotEmpty()) {
+                                    Text("Arrange buttons — long-press and drag in the preview")
+                                    if (orientation == "auto") {
+                                        Text("Auto uses a horizontal layout when wide, vertical when tall.")
+                                    }
+                                    PresetWidgetPreview(
+                                        chosen = chosen,
+                                        names = presets.associate { it.id to it.name },
+                                        vertical = orientation == "vertical",
+                                        gapDp = spacing.roundToInt(),
+                                        outerInsetDp = outerInset.roundToInt(),
+                                        textColor = textColor,
+                                        textSizeSp = presetTextSize.roundToInt(),
+                                        textWeight = presetTextWeight,
+                                        activeTextColor = activeTextColor,
+                                        widgetColor = widgetColor,
+                                        identityMode = identityMode,
+                                        identityText = identityText,
+                                        activeColor = activeColor,
+                                    )
+                                }
+
+                                Text("Between buttons: ${spacing.roundToInt()} dp")
+                                Slider(value = spacing, onValueChange = { spacing = it }, valueRange = 0f..96f)
+                                Text("Outside inset: ${outerInset.roundToInt()} dp")
+                                Slider(value = outerInset, onValueChange = { outerInset = it }, valueRange = 0f..64f)
+                            }
+                        }
+
+                        DialogSectionLabel(label = "Preset label")
+                        DialogCard {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp),
+                            ) {
+                                Text("Size: ${presetTextSize.roundToInt()} sp")
+                                Slider(
+                                    value = presetTextSize,
+                                    onValueChange = { presetTextSize = it },
+                                    valueRange = 10f..30f,
+                                    steps = 19,
+                                )
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    listOf("normal" to "Regular", "bold" to "Bold")
+                                        .forEach { (weight, label) ->
+                                            FilterChip(
+                                                selected = presetTextWeight == weight,
+                                                onClick = { presetTextWeight = weight },
+                                                label = { Text(label) },
+                                            )
+                                        }
+                                }
+                            }
+                        }
+
+                        DialogSectionLabel(label = "Colours")
+                        DialogCard {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp),
+                            ) {
+                                WidgetColorSetting("Text (inactive)", textColor) { editingColor = "Text" }
+                                WidgetColorSetting("Text (active)", activeTextColor) { editingColor = "Active text" }
+                                WidgetColorSetting("Widget (inactive)", widgetColor) { editingColor = "Widget" }
+                                WidgetColorSetting("Active preset", activeColor) { editingColor = "Active" }
+                            }
+                        }
                     }
                 }
 
