@@ -242,24 +242,46 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                 val title = editingColor
                 if (title != null) {
                     key(title) {
+                        // Freeze the original colour while preview updates the underlying state.
+                        val initial = remember {
+                            when (title) {
+                                "Text" -> textColor
+                                "Active text" -> activeTextColor
+                                "Widget" -> widgetColor
+                                else -> activeColor
+                            }
+                        }
+                        val updateColour: (Int) -> Unit = { colour ->
+                            when (title) {
+                                "Text" -> textColor = colour
+                                "Active text" -> activeTextColor = colour
+                                "Widget" -> widgetColor = colour
+                                else -> activeColor = colour
+                            }
+                        }
                         PresetWidgetColorPicker(
                             title = title,
-                            initialColor =
-                                when (title) {
-                                    "Text" -> textColor
-                                    "Active text" -> activeTextColor
-                                    "Widget" -> widgetColor
-                                    else -> activeColor
-                                },
-                            onDismiss = { editingColor = null },
-                            onSelect = { selected ->
-                                when (title) {
-                                    "Text" -> textColor = selected
-                                    "Active text" -> activeTextColor = selected
-                                    "Widget" -> widgetColor = selected
-                                    else -> activeColor = selected
-                                }
+                            initialColor = initial,
+                            onPreview = updateColour,
+                            onDismiss = {
+                                updateColour(initial)
                                 editingColor = null
+                            },
+                            onSelect = { colour ->
+                                updateColour(colour)
+                                editingColor = null
+                            },
+                            preview = { picked ->
+                                WidgetPickerLivePreview(
+                                    presetLabels = chosen.take(2).map { id ->
+                                        presets.firstOrNull { it.id == id }?.name ?: "Missing preset"
+                                    },
+                                    identity = if (identityMode == "custom") identityText.trim() else "ViPER",
+                                    inactiveText = if (title == "Text") picked else textColor,
+                                    activeText = if (title == "Active text") picked else activeTextColor,
+                                    inactiveBackground = if (title == "Widget") picked else widgetColor,
+                                    activeBackground = if (title == "Active") picked else activeColor,
+                                )
                             },
                         )
                     }
