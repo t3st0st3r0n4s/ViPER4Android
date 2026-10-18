@@ -12,6 +12,9 @@ data class WidgetConfiguration(
     val gapDp: Int = 4,
     val outerInsetDp: Int = 0,
     val textColor: Int = DEFAULT_TEXT_COLOR,
+    val activeTextColor: Int = DEFAULT_TEXT_COLOR,
+    val identityMode: String = "viper",
+    val identityText: String = "",
     val widgetColor: Int = DEFAULT_WIDGET_COLOR,
     val activeColor: Int = DEFAULT_ACTIVE_COLOR,
 )
@@ -45,6 +48,9 @@ object PresetWidgetSettings {
                 gapDp = json.optInt("gapDp", 4).coerceIn(0, 96),
                 outerInsetDp = json.optInt("outerInsetDp", 0).coerceIn(0, 64),
                 textColor = json.optInt("textColor", DEFAULT_TEXT_COLOR),
+                activeTextColor = json.optInt("activeTextColor", DEFAULT_TEXT_COLOR),
+                identityMode = json.optString("identityMode", "viper").takeIf { it in setOf("viper", "custom", "none") } ?: "viper",
+                identityText = json.optString("identityText", "").take(18),
                 widgetColor = json.optInt("widgetColor", DEFAULT_WIDGET_COLOR),
                 activeColor = json.optInt("activeColor", DEFAULT_ACTIVE_COLOR),
             )
@@ -65,6 +71,9 @@ object PresetWidgetSettings {
                 .put("gapDp", config.gapDp.coerceIn(0, 96))
                 .put("outerInsetDp", config.outerInsetDp.coerceIn(0, 64))
                 .put("textColor", config.textColor)
+                .put("activeTextColor", config.activeTextColor)
+                .put("identityMode", config.identityMode)
+                .put("identityText", config.identityText.take(18))
                 .put("widgetColor", config.widgetColor)
                 .put("activeColor", config.activeColor)
         preferences(context).edit().putString("widget_$widgetId", json.toString()).apply()
