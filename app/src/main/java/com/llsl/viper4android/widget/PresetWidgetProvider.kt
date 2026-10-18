@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.View
 import android.widget.RemoteViews
 import com.llsl.viper4android.R
 import com.llsl.viper4android.data.model.Preset
@@ -150,7 +151,22 @@ class PresetWidgetProvider : AppWidgetProvider() {
                     R.id.widget_preset_label,
                     preset?.name ?: "Missing preset",
                 )
-                item.setTextColor(R.id.widget_preset_label, config?.textColor ?: DEFAULT_TEXT_COLOR)
+                val labelColor =
+                    if (active == choice.id) config?.activeTextColor ?: DEFAULT_TEXT_COLOR
+                    else config?.textColor ?: DEFAULT_TEXT_COLOR
+                item.setTextColor(R.id.widget_preset_label, labelColor)
+                val identity =
+                    when (config?.identityMode) {
+                        "none" -> ""
+                        "custom" -> config.identityText.ifBlank { "ViPER" }
+                        else -> "ViPER"
+                    }
+                item.setTextViewText(R.id.widget_identity, identity)
+                item.setTextColor(R.id.widget_identity, labelColor)
+                item.setViewVisibility(
+                    R.id.widget_identity,
+                    if (identity.isBlank()) View.GONE else View.VISIBLE,
+                )
                 val backgroundColor =
                     if (active == choice.id) config?.activeColor ?: DEFAULT_ACTIVE_COLOR
                     else config?.widgetColor ?: DEFAULT_WIDGET_COLOR
