@@ -171,13 +171,28 @@ class PresetWidgetProvider : AppWidgetProvider() {
                     if (active == choice.id) config?.activeTextColor ?: DEFAULT_TEXT_COLOR
                     else config?.textColor ?: DEFAULT_TEXT_COLOR
                 item.setTextColor(R.id.widget_preset_label, labelColor)
-                val identity =
-                    if (config?.identityMode == "custom") config.identityText.trim() else "ViPER"
+                val viperIdentity = config?.identityMode != "custom"
+                val identity = if (viperIdentity) "ViPER" else config?.identityText?.trim().orEmpty()
                 item.setTextViewText(R.id.widget_identity, identity)
                 item.setTextColor(R.id.widget_identity, labelColor)
                 item.setViewVisibility(
                     R.id.widget_identity,
                     if (identity.isBlank()) View.GONE else View.VISIBLE,
+                )
+                item.setViewVisibility(
+                    R.id.widget_identity_icon,
+                    if (viperIdentity) View.VISIBLE else View.GONE,
+                )
+                if (viperIdentity) {
+                    item.setInt(R.id.widget_identity_icon, "setColorFilter", labelColor)
+                }
+                val density = context.resources.displayMetrics.density
+                item.setViewPadding(
+                    R.id.widget_identity,
+                    ((if (viperIdentity) 18 else 6) * density).toInt(),
+                    (2 * density).toInt(),
+                    0,
+                    0,
                 )
                 val backgroundColor =
                     if (active == choice.id) config?.activeColor ?: DEFAULT_ACTIVE_COLOR

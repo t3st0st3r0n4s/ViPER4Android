@@ -1,6 +1,10 @@
 package com.llsl.viper4android.widget
 
 import android.view.HapticFeedbackConstants
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.GraphicEq
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.size
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
@@ -74,6 +78,7 @@ fun PresetWidgetPreview(
                         textWeight = textWeight,
                         backgroundColor = if (index == 0) activeColor else widgetColor,
                         identity = if (identityMode == "custom") identityText.trim() else "ViPER",
+                        showViperIcon = identityMode != "custom",
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
@@ -97,6 +102,7 @@ fun PresetWidgetPreview(
                         textWeight = textWeight,
                         backgroundColor = if (index == 0) activeColor else widgetColor,
                         identity = if (identityMode == "custom") identityText.trim() else "ViPER",
+                        showViperIcon = identityMode != "custom",
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -117,6 +123,7 @@ private fun PreviewPresetButton(
     textWeight: String,
     backgroundColor: Int,
     identity: String,
+    showViperIcon: Boolean,
     modifier: Modifier,
 ) {
     var dimensionPx by remember { mutableIntStateOf(1) }
@@ -189,14 +196,27 @@ private fun PreviewPresetButton(
             overflow = TextOverflow.Ellipsis,
         )
         if (identity.isNotBlank()) {
-            Text(
-                identity,
+            Row(
                 modifier = Modifier.align(Alignment.TopStart).padding(start = 6.dp, top = 2.dp),
-                color = Color(textColor),
-                fontSize = 9.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                if (showViperIcon) {
+                    Icon(
+                        imageVector = Icons.Default.GraphicEq,
+                        contentDescription = null,
+                        modifier = Modifier.size(10.dp),
+                        tint = Color(textColor),
+                    )
+                }
+                Text(
+                    identity,
+                    color = Color(textColor),
+                    fontSize = 9.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }

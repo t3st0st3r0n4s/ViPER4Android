@@ -18,6 +18,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.GraphicEq
+import androidx.compose.material3.Icon
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -98,6 +101,7 @@ fun WidgetPickerLivePreview(
     textSizeSp: Int,
     textWeight: String,
     identity: String,
+    showViperIcon: Boolean,
     inactiveText: Int,
     activeText: Int,
     inactiveBackground: Int,
@@ -120,6 +124,7 @@ fun WidgetPickerLivePreview(
                     name = name,
                     active = index == 0,
                     identity = identity,
+                    showViperIcon = showViperIcon,
                     textSizeSp = textSizeSp,
                     textWeight = textWeight,
                     inactiveText = inactiveText,
@@ -140,6 +145,7 @@ fun WidgetPickerLivePreview(
                     name = name,
                     active = index == 0,
                     identity = identity,
+                    showViperIcon = showViperIcon,
                     textSizeSp = textSizeSp,
                     textWeight = textWeight,
                     inactiveText = inactiveText,
@@ -158,6 +164,7 @@ private fun WidgetPickerPreviewButton(
     name: String,
     active: Boolean,
     identity: String,
+    showViperIcon: Boolean,
     textSizeSp: Int,
     textWeight: String,
     inactiveText: Int,
@@ -180,14 +187,27 @@ private fun WidgetPickerPreviewButton(
             overflow = TextOverflow.Ellipsis,
         )
         if (identity.isNotBlank()) {
-            Text(
-                identity,
+            Row(
                 modifier = Modifier.align(Alignment.TopStart).padding(start = 6.dp, top = 2.dp),
-                fontSize = 9.sp,
-                color = Color(foreground),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                if (showViperIcon) {
+                    Icon(
+                        imageVector = Icons.Default.GraphicEq,
+                        contentDescription = null,
+                        modifier = Modifier.size(10.dp),
+                        tint = Color(foreground),
+                    )
+                }
+                Text(
+                    identity,
+                    fontSize = 9.sp,
+                    color = Color(foreground),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
         }
     }
 }

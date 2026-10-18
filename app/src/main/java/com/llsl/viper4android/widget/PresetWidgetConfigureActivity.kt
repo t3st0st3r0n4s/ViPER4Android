@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AspectRatio
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.DragIndicator
+import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.TextFields
@@ -227,6 +228,15 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                             selected = identityMode == mode,
                                             onClick = { identityMode = mode },
                                             label = { Text(label) },
+                                            leadingIcon = if (mode == "viper") {
+                                                {
+                                                    Icon(
+                                                        imageVector = Icons.Default.GraphicEq,
+                                                        contentDescription = null,
+                                                        modifier = Modifier.size(18.dp),
+                                                    )
+                                                }
+                                            } else null,
                                         )
                                     }
                                 }
@@ -360,6 +370,7 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                     textSizeSp = presetTextSize.roundToInt(),
                                     textWeight = presetTextWeight,
                                     identity = if (identityMode == "custom") identityText.trim() else "ViPER",
+                                    showViperIcon = identityMode != "custom",
                                     inactiveText = if (title == "Text") picked else textColor,
                                     activeText = if (title == "Active text") picked else activeTextColor,
                                     inactiveBackground = if (title == "Widget") picked else widgetColor,
