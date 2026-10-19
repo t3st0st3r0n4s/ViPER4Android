@@ -5,15 +5,14 @@
     android:layout_height="match_parent"
     android:layout_weight="1">
     <FrameLayout
-        android:id="@+id/widget_preset_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/widget_preset_inactive">
-        <FrameLayout
-            android:id="@+id/widget_preset_face"
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/widget_preset_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="1dp">
+            android:scaleType="fitXY"
+            android:contentDescription="@null" />
         <TextView
         android:id="@+id/widget_preset_label"
         android:layout_width="match_parent"
@@ -48,6 +47,5 @@
             android:paddingTop="2dp"
             android:textSize="9sp"
             android:textColor="#FFFFFFFF" />
-        </FrameLayout>
     </FrameLayout>
 </LinearLayout>

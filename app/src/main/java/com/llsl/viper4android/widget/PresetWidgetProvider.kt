@@ -4,7 +4,10 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
@@ -26,6 +29,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -90,6 +94,28 @@ class PresetWidgetProvider : AppWidgetProvider() {
         PresetWidgetSettings.delete(context, widgetIds)
     }
 
+    private fun makePresetBackground(
+        density: Float,
+        widthDp: Float,
+        heightDp: Float,
+        fillColor: Int,
+        strokeColor: Int,
+        radiusDp: Int,
+        strokeDp: Int,
+    ): Bitmap {
+        val width = (widthDp * density).roundToInt().coerceIn(1, 1024)
+        val height = (heightDp * density).roundToInt().coerceIn(1, 1024)
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val drawable = GradientDrawable().apply {
+            setColor(fillColor)
+            cornerRadius = radiusDp * density
+            if (strokeDp > 0) setStroke((strokeDp * density).roundToInt().coerceAtLeast(1), strokeColor)
+        }
+        drawable.setBounds(0, 0, width, height)
+        drawable.draw(Canvas(bitmap))
+        return bitmap
+    }
+
     private fun render(
         context: Context,
         manager: AppWidgetManager,
@@ -140,7 +166,32 @@ class PresetWidgetProvider : AppWidgetProvider() {
         } else {
             val active = ActivePresetSelection.activePresetId(context)
             val gapDp = config?.gapDp ?: 4
-            val gapPx = (context.resources.displayMetrics.density * gapDp).toInt()
+            val density = context.resources.displayMetrics.density
+            val gapPx = (density * gapDp).toInt()
+            val insetDp = config?.outerInsetDp ?: 0
+            // Use launcher-reported widget dimensions to size the translucent artwork.
+            val widthDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 80).coerceAtLeast(40)
+            val heightDp = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 40).coerceAtLeast(40)
+            val availableWidthDp =
+                (widthDp - 2 * insetDp - (if (vertical) 0 else gapDp * (choices.size - 1))).coerceAtLeast(1)
+            val availableHeightDp =
+                (heightDp - 2 * insetDp - (if (vertical) gapDp * (choices.size - 1) else 0)).coerceAtLeast(1)
+            val buttonWidthDp = availableWidthDp.toFloat() / (if (vertical) 1 else choices.size)
+            val buttonHeightDp = availableHeightDp.toFloat() / (if (vertical) choices.size else 1)
+            val radiusDp = (config?.cornerRadiusDp ?: 10).coerceIn(0, 24)
+            val borderDp = (config?.borderWidthDp ?: 1).coerceIn(0, 4)
+            val normalBackground = makePresetBackground(
+                density, buttonWidthDp, buttonHeightDp,
+                config?.widgetColor ?: DEFAULT_WIDGET_COLOR,
+                config?.borderColor ?: DEFAULT_BORDER_COLOR,
+                radiusDp, borderDp,
+            )
+            val activeBackground = makePresetBackground(
+                density, buttonWidthDp, buttonHeightDp,
+                config?.activeColor ?: DEFAULT_ACTIVE_COLOR,
+                config?.activeBorderColor ?: DEFAULT_ACTIVE_BORDER_COLOR,
+                radiusDp, borderDp,
+            )
             choices.forEachIndexed { index, choice ->
                 val preset = presets[choice.id]
                 val itemLayout =
@@ -186,7 +237,6 @@ class PresetWidgetProvider : AppWidgetProvider() {
                 if (viperIdentity) {
                     item.setInt(R.id.widget_identity_icon, "setColorFilter", labelColor)
                 }
-                val density = context.resources.displayMetrics.density
                 item.setViewPadding(
                     R.id.widget_identity,
                     ((if (viperIdentity) 18 else 6) * density).toInt(),
@@ -195,35 +245,10 @@ class PresetWidgetProvider : AppWidgetProvider() {
                     0,
                 )
                 val selected = active == choice.id
-                val backgroundColor =
-                    if (selected) config?.activeColor ?: DEFAULT_ACTIVE_COLOR
-                    else config?.widgetColor ?: DEFAULT_WIDGET_COLOR
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    val borderColor =
-                        if (selected) config?.activeBorderColor ?: DEFAULT_ACTIVE_BORDER_COLOR
-                        else config?.borderColor ?: DEFAULT_BORDER_COLOR
-                    val radiusDp = (config?.cornerRadiusDp ?: 10).coerceIn(0, 24)
-                    val borderDp = (config?.borderWidthDp ?: 1).coerceIn(0, 4)
-                    item.setInt(R.id.widget_preset_frame, "setBackgroundColor", borderColor)
-                    item.setInt(R.id.widget_preset_face, "setBackgroundColor", backgroundColor)
-                    item.setBoolean(R.id.widget_preset_frame, "setClipToOutline", true)
-                    item.setBoolean(R.id.widget_preset_face, "setClipToOutline", true)
-                    item.setViewOutlinePreferredRadius(
-                        R.id.widget_preset_frame, radiusDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP,
-                    )
-                    item.setViewOutlinePreferredRadius(
-                        R.id.widget_preset_face, (radiusDp - borderDp).coerceAtLeast(0).toFloat(),
-                        TypedValue.COMPLEX_UNIT_DIP,
-                    )
-                    listOf(
-                        RemoteViews.MARGIN_LEFT, RemoteViews.MARGIN_RIGHT,
-                        RemoteViews.MARGIN_TOP, RemoteViews.MARGIN_BOTTOM,
-                    ).forEach { side ->
-                        item.setViewLayoutMargin(
-                            R.id.widget_preset_face, side, borderDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP,
-                        )
-                    }
-                }
+                item.setImageViewBitmap(
+                    R.id.widget_preset_background,
+                    if (selected) activeBackground else normalBackground,
+                )
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     // Margins participate in LinearLayout weight distribution, so every
                     // button (including the first) shrinks equally as spacing increases.
