@@ -2,6 +2,8 @@
 
 Material Design 3 UI for ViPER4Android FX. Full feature set of the ViPER4Android DSP engine with a modern interface.
 
+This fork extends [the upstream project](https://github.com/likelikeslike/ViPER4Android) with a configurable home-screen preset widget.
+
 ## Features
 
 ### Audio Effects
@@ -47,6 +49,22 @@ Material Design 3 UI for ViPER4Android FX. Full feature set of the ViPER4Android
 - In-app log viewer (tap `Driver Version` 7 times in Settings)
 - Audio effects documentation (long press each effect)
 - In-app update checker (press app version in Settings)
+- Configurable home-screen preset widget (this fork)
+
+## Preset Widget (fork extension)
+
+The widget applies saved ViPER4Android presets directly from your launcher without opening the app.
+It highlights the selected preset for the current audio output device; changing effect settings manually clears that selection.
+
+1. Create or import your presets in ViPER4Android.
+2. From your launcher's **Widgets** menu, add the **ViPER presets** widget and choose which presets to display.
+3. Long-press and drag the buttons in the live preview to change their order. Set **Horizontal**, **Vertical**, or **Auto** layout, then customise the widget label, spacing, corner radius, border width, text size and weight.
+4. Use **Colours** to set active and inactive background, border and text colours independently, including transparency.
+5. Tap **Save widget**. Tap a preset button on your home screen to apply it.
+
+The configuration screen keeps the preview visible while settings scroll. On a short or landscape screen, use **Hide preview** to free space; **Show preview** restores it. Launcher support for reopening widget configuration can vary.
+
+**Testing this fork:** The upstream releases linked below do **not necessarily** include this extension. For a widget-enabled test APK, open this fork's [Preset widget build workflow](https://github.com/t3st0st3r0n4s/ViPER4Android/actions/workflows/preset-widget-build.yml), select a successful run, and download its APK artifact. CI builds a minified release variant but signs it with a temporary debug key. That signature may differ between builds and from your installed APK, so it is **not a reliably upgradeable release**. Back up your settings before replacing an existing installation. Normal DSP operation still requires a compatible ViPER driver/module.
 
 ## Installation
 

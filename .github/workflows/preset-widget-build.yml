@@ -2,13 +2,13 @@ name: Preset widget build
 
 on:
   push:
-    branches: [feature/preset-widget]
+    branches: [main]
 
 permissions:
   contents: read
 
 jobs:
-  debug-apk:
+  release-test-apk:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
