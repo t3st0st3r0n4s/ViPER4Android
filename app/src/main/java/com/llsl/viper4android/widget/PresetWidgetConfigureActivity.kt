@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -21,7 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AspectRatio
 import androidx.compose.material.icons.filled.Badge
-import androidx.compose.material.icons.filled.DragIndicator
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.Palette
@@ -178,18 +179,62 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                         }
                     },
                 ) { contentPadding ->
-                    Column(
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .padding(contentPadding)
+                    Column(modifier = Modifier.fillMaxSize().padding(contentPadding)) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surface)
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            Text("Preset widget", style = MaterialTheme.typography.titleLarge)
+                            if (chosen.isNotEmpty()) {
+                                Text(
+                                    "Live preview — long-press and drag to reorder",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                // Keep large vertical layouts accessible without occupying the entire screen.
+                                Box(
+                                    modifier = Modifier.fillMaxWidth()
+                                        .heightIn(max = 192.dp)
+                                        .verticalScroll(rememberScrollState()),
+                                ) {
+                                    PresetWidgetPreview(
+                                        chosen = chosen,
+                                        names = presets.associate { it.id to it.name },
+                                        vertical = orientation == "vertical",
+                                        gapDp = spacing.roundToInt(),
+                                        outerInsetDp = outerInset.roundToInt(),
+                                        cornerRadiusDp = cornerRadius.roundToInt(),
+                                        borderWidthDp = borderWidth.roundToInt(),
+                                        textColor = textColor,
+                                        textSizeSp = presetTextSize.roundToInt(),
+                                        textWeight = presetTextWeight,
+                                        activeTextColor = activeTextColor,
+                                        widgetColor = widgetColor,
+                                        identityMode = identityMode,
+                                        identityText = identityText,
+                                        activeColor = activeColor,
+                                        borderColor = borderColor,
+                                        activeBorderColor = activeBorderColor,
+                                    )
+                                }
+                            } else {
+                                Text(
+                                    "Select presets below to preview.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+
+                        Column(
+                            modifier = Modifier.weight(1f).fillMaxWidth()
                                 .verticalScroll(rememberScrollState())
                                 .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        Text("Preset widget", style = MaterialTheme.typography.titleLarge)
-
-                        WidgetSettingsGroup(title = "Presets", icon = Icons.Default.LibraryMusic) {
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
+                            WidgetSettingsGroup(title = "Presets", icon = Icons.Default.LibraryMusic) {
                             Column(
                                 modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                                 verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -226,6 +271,9 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                             label = { Text(option.replaceFirstChar { it.uppercase() }) },
                                         )
                                     }
+                                }
+                                if (orientation == "auto") {
+                                    Text("Auto uses a horizontal layout when wide, vertical when tall.")
                                 }
                             }
                         }
@@ -270,37 +318,11 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             }
                         }
 
-                        WidgetSettingsGroup(title = "Buttons & spacing", icon = Icons.Default.DragIndicator) {
+                        WidgetSettingsGroup(title = "Spacing & shape", icon = Icons.Default.Tune) {
                             Column(
                                 modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                                 verticalArrangement = Arrangement.spacedBy(10.dp),
                             ) {
-                                if (chosen.isNotEmpty()) {
-                                    Text("Arrange buttons — long-press and drag in the preview")
-                                    if (orientation == "auto") {
-                                        Text("Auto uses a horizontal layout when wide, vertical when tall.")
-                                    }
-                                    PresetWidgetPreview(
-                                        chosen = chosen,
-                                        names = presets.associate { it.id to it.name },
-                                        vertical = orientation == "vertical",
-                                        gapDp = spacing.roundToInt(),
-                                        outerInsetDp = outerInset.roundToInt(),
-                                        cornerRadiusDp = cornerRadius.roundToInt(),
-                                        borderWidthDp = borderWidth.roundToInt(),
-                                        textColor = textColor,
-                                        textSizeSp = presetTextSize.roundToInt(),
-                                        textWeight = presetTextWeight,
-                                        activeTextColor = activeTextColor,
-                                        widgetColor = widgetColor,
-                                        identityMode = identityMode,
-                                        identityText = identityText,
-                                        activeColor = activeColor,
-                                        borderColor = borderColor,
-                                        activeBorderColor = activeBorderColor,
-                                    )
-                                }
-
                                 Text("Between buttons: ${spacing.roundToInt()} dp")
                                 Slider(value = spacing, onValueChange = { spacing = it }, valueRange = 0f..96f)
                                 Text("Outside inset: ${outerInset.roundToInt()} dp")
@@ -360,6 +382,7 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                     onPick = { editingColor = it },
                                 )
                             }
+                        }
                         }
                     }
                 }
