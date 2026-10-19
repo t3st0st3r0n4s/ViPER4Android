@@ -293,7 +293,7 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                             }
                         }
 
-                        WidgetSettingsGroup(title = "Widget identity (inside buttons)", icon = Icons.Default.Badge) {
+                        WidgetSettingsGroup(title = "Widget label", icon = Icons.Default.Badge) {
                             Column(
                                 modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                                 verticalArrangement = Arrangement.spacedBy(10.dp),
