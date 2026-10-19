@@ -40,15 +40,13 @@ object ActivePresetSelection {
         return prefs.getString(CURRENT_DEVICE, null) == deviceId
     }
 
-    fun forgetPreset(context: Context, presetId: Long): Boolean {
+    fun forgetPreset(context: Context, presetId: Long) {
         val prefs = prefs(context)
-        val current = prefs.getString(CURRENT_DEVICE, null)
         val keys = prefs.all.filter { (key, value) ->
             key.startsWith(DEVICE_PREFIX) && value == presetId
         }.keys
-        if (keys.isEmpty()) return false
+        if (keys.isEmpty()) return
         prefs.edit().apply { keys.forEach { remove(it) } }.apply()
-        return DEVICE_PREFIX + current in keys
     }
 
     fun forgetAllPresets(context: Context) {
