@@ -6,8 +6,9 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.RectF
 import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
@@ -94,25 +95,33 @@ class PresetWidgetProvider : AppWidgetProvider() {
         PresetWidgetSettings.delete(context, widgetIds)
     }
 
-    private fun makePresetBackground(
+    private fun makePresetLayer(
         density: Float,
         widthDp: Float,
         heightDp: Float,
-        fillColor: Int,
-        strokeColor: Int,
+        color: Int,
         radiusDp: Int,
-        strokeDp: Int,
+        borderDp: Int,
+        isBorder: Boolean,
     ): Bitmap {
         val width = (widthDp * density).roundToInt().coerceIn(1, 1024)
         val height = (heightDp * density).roundToInt().coerceIn(1, 1024)
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-        val drawable = GradientDrawable().apply {
-            setColor(fillColor)
-            cornerRadius = radiusDp * density
-            if (strokeDp > 0) setStroke((strokeDp * density).roundToInt().coerceAtLeast(1), strokeColor)
+        val borderPx = if (borderDp == 0) 0 else (borderDp * density).roundToInt().coerceAtLeast(1)
+        if (isBorder && borderPx == 0) return bitmap
+        // The fill stops at the inner edge of the border. Neither alpha channel
+        // can reveal the other layer: transparent pixels show the launcher.
+        val inset = if (isBorder) borderPx / 2f else borderPx.toFloat()
+        val rect = RectF(inset, inset, width - inset, height - inset)
+        if (rect.width() > 0f && rect.height() > 0f) {
+            val radius = (radiusDp * density - inset).coerceAtLeast(0f)
+            val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                this.color = color
+                style = if (isBorder) Paint.Style.STROKE else Paint.Style.FILL
+                if (isBorder) strokeWidth = borderPx.toFloat()
+            }
+            Canvas(bitmap).drawRoundRect(rect, radius, radius, paint)
         }
-        drawable.setBounds(0, 0, width, height)
-        drawable.draw(Canvas(bitmap))
         return bitmap
     }
 
@@ -180,17 +189,21 @@ class PresetWidgetProvider : AppWidgetProvider() {
             val buttonHeightDp = availableHeightDp.toFloat() / (if (vertical) choices.size else 1)
             val radiusDp = (config?.cornerRadiusDp ?: 10).coerceIn(0, 24)
             val borderDp = (config?.borderWidthDp ?: 1).coerceIn(0, 4)
-            val normalBackground = makePresetBackground(
+            val normalBackground = makePresetLayer(
                 density, buttonWidthDp, buttonHeightDp,
-                config?.widgetColor ?: DEFAULT_WIDGET_COLOR,
-                config?.borderColor ?: DEFAULT_BORDER_COLOR,
-                radiusDp, borderDp,
+                config?.widgetColor ?: DEFAULT_WIDGET_COLOR, radiusDp, borderDp, false,
             )
-            val activeBackground = makePresetBackground(
+            val activeBackground = makePresetLayer(
                 density, buttonWidthDp, buttonHeightDp,
-                config?.activeColor ?: DEFAULT_ACTIVE_COLOR,
-                config?.activeBorderColor ?: DEFAULT_ACTIVE_BORDER_COLOR,
-                radiusDp, borderDp,
+                config?.activeColor ?: DEFAULT_ACTIVE_COLOR, radiusDp, borderDp, false,
+            )
+            val normalBorder = makePresetLayer(
+                density, buttonWidthDp, buttonHeightDp,
+                config?.borderColor ?: DEFAULT_BORDER_COLOR, radiusDp, borderDp, true,
+            )
+            val activeBorder = makePresetLayer(
+                density, buttonWidthDp, buttonHeightDp,
+                config?.activeBorderColor ?: DEFAULT_ACTIVE_BORDER_COLOR, radiusDp, borderDp, true,
             )
             choices.forEachIndexed { index, choice ->
                 val preset = presets[choice.id]
@@ -248,6 +261,10 @@ class PresetWidgetProvider : AppWidgetProvider() {
                 item.setImageViewBitmap(
                     R.id.widget_preset_background,
                     if (selected) activeBackground else normalBackground,
+                )
+                item.setImageViewBitmap(
+                    R.id.widget_preset_border,
+                    if (selected) activeBorder else normalBorder,
                 )
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     // Margins participate in LinearLayout weight distribution, so every

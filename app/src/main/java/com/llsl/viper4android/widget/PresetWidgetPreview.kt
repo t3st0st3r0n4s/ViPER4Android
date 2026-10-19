@@ -16,8 +16,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.matchParentSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -192,16 +192,19 @@ private fun PreviewPresetButton(
                             }
                         },
                     )
-                }.background(
-                    Color(backgroundColor),
-                    RoundedCornerShape(cornerRadiusDp.dp),
-                ).border(
+                }.border(
                     borderWidthDp.dp,
                     Color(borderColor),
                     RoundedCornerShape(cornerRadiusDp.dp),
                 ),
         contentAlignment = Alignment.Center,
     ) {
+        Box(
+            modifier = Modifier.matchParentSize().padding(borderWidthDp.dp).background(
+                Color(backgroundColor),
+                RoundedCornerShape((cornerRadiusDp - borderWidthDp).coerceAtLeast(0).dp),
+            ),
+        )
         Text(
             label,
             modifier = Modifier.padding(vertical = 4.dp, horizontal = 4.dp),

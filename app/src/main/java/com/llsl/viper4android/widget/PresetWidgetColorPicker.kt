@@ -258,7 +258,11 @@ private fun WidgetPickerPreviewButton(
             RoundedCornerShape(cornerRadiusDp.dp),
         ),
     ) {
-        CheckerboardSwatch(background, Modifier.matchParentSize(), cornerRadiusDp)
+        CheckerboardSwatch(
+            background,
+            Modifier.matchParentSize().padding(borderWidthDp.dp),
+            (cornerRadiusDp - borderWidthDp).coerceAtLeast(0),
+        )
         Text(
             name,
             modifier = Modifier.align(Alignment.Center).padding(vertical = 4.dp, horizontal = 4.dp),
