@@ -22,7 +22,9 @@ on:
 
 jobs:
   publish:
-    if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'release: publish widget preview v2.1.1'
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.head_commit.message == 'release: publish widget preview v2.1.1'
     runs-on: ubuntu-latest
     permissions:
       actions: read
