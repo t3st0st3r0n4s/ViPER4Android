@@ -199,7 +199,9 @@ class PresetWidgetProvider : AppWidgetProvider() {
                     if (selected) config?.activeColor ?: DEFAULT_ACTIVE_COLOR
                     else config?.widgetColor ?: DEFAULT_WIDGET_COLOR
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    val borderColor = if (selected) 0xFF94B5FF.toInt() else 0xFF646B78.toInt()
+                    val borderColor =
+                        if (selected) config?.activeBorderColor ?: DEFAULT_ACTIVE_BORDER_COLOR
+                        else config?.borderColor ?: DEFAULT_BORDER_COLOR
                     val radiusDp = (config?.cornerRadiusDp ?: 10).coerceIn(0, 24)
                     val borderDp = (config?.borderWidthDp ?: 1).coerceIn(0, 4)
                     item.setInt(R.id.widget_preset_frame, "setBackgroundColor", borderColor)

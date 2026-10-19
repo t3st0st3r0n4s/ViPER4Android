@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -48,6 +49,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -58,11 +62,66 @@ import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 @Composable
-fun WidgetColorSetting(label: String, color: Int, onClick: () -> Unit) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, modifier = Modifier.weight(1f))
-        CheckerboardSwatch(color, Modifier.size(32.dp).clickable(onClick = onClick))
-        TextButton(onClick = onClick) { Text("Pick") }
+fun WidgetColorMatrix(
+    inactiveBackground: Int,
+    activeBackground: Int,
+    inactiveText: Int,
+    activeText: Int,
+    inactiveBorder: Int,
+    activeBorder: Int,
+    onPick: (String) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Spacer(Modifier.weight(0.9f))
+            Text("Inactive", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+            Text("Active", modifier = Modifier.weight(1f), style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+        }
+        WidgetColorRow("Background", inactiveBackground, activeBackground, "Widget", "Active", onPick)
+        WidgetColorRow("Text", inactiveText, activeText, "Text", "Active text", onPick)
+        WidgetColorRow("Border", inactiveBorder, activeBorder, "Border", "Active border", onPick)
+    }
+}
+
+@Composable
+private fun WidgetColorRow(
+    label: String,
+    inactive: Int,
+    active: Int,
+    inactiveKey: String,
+    activeKey: String,
+    onPick: (String) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(label, modifier = Modifier.weight(0.9f), style = MaterialTheme.typography.bodyMedium)
+        WidgetColorCell(inactive, "$label inactive", Modifier.weight(1f)) { onPick(inactiveKey) }
+        WidgetColorCell(active, "$label active", Modifier.weight(1f)) { onPick(activeKey) }
+    }
+}
+
+@Composable
+private fun WidgetColorCell(color: Int, label: String, modifier: Modifier, onClick: () -> Unit) {
+    val shape = RoundedCornerShape(8.dp)
+    Box(
+        modifier = modifier
+            .height(44.dp)
+            .clip(shape)
+            .clickable(onClick = onClick)
+            .semantics { contentDescription = "$label colour" }
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape),
+        contentAlignment = Alignment.Center,
+    ) {
+        CheckerboardSwatch(color, Modifier.fillMaxWidth().padding(horizontal = 9.dp).height(26.dp))
     }
 }
 
@@ -105,6 +164,8 @@ fun WidgetPickerLivePreview(
     textWeight: String,
     identity: String,
     showViperIcon: Boolean,
+    inactiveBorder: Int,
+    activeBorder: Int,
     inactiveText: Int,
     activeText: Int,
     inactiveBackground: Int,
@@ -130,6 +191,8 @@ fun WidgetPickerLivePreview(
                     showViperIcon = showViperIcon,
                     textSizeSp = textSizeSp,
                     textWeight = textWeight,
+                    inactiveBorder = inactiveBorder,
+                    activeBorder = activeBorder,
                     cornerRadiusDp = cornerRadiusDp,
                     borderWidthDp = borderWidthDp,
                     inactiveText = inactiveText,
@@ -153,6 +216,8 @@ fun WidgetPickerLivePreview(
                     showViperIcon = showViperIcon,
                     textSizeSp = textSizeSp,
                     textWeight = textWeight,
+                    inactiveBorder = inactiveBorder,
+                    activeBorder = activeBorder,
                     cornerRadiusDp = cornerRadiusDp,
                     borderWidthDp = borderWidthDp,
                     inactiveText = inactiveText,
@@ -174,6 +239,8 @@ private fun WidgetPickerPreviewButton(
     showViperIcon: Boolean,
     textSizeSp: Int,
     textWeight: String,
+    inactiveBorder: Int,
+    activeBorder: Int,
     cornerRadiusDp: Int,
     borderWidthDp: Int,
     inactiveText: Int,
@@ -187,7 +254,7 @@ private fun WidgetPickerPreviewButton(
     Box(
         modifier.heightIn(min = 56.dp).border(
             borderWidthDp.dp,
-            Color(if (active) 0xFF94B5FF else 0xFF646B78),
+            Color(if (active) activeBorder else inactiveBorder),
             RoundedCornerShape(cornerRadiusDp.dp),
         ),
     ) {

@@ -21,11 +21,15 @@ data class WidgetConfiguration(
     val identityText: String = "",
     val widgetColor: Int = DEFAULT_WIDGET_COLOR,
     val activeColor: Int = DEFAULT_ACTIVE_COLOR,
+    val borderColor: Int = DEFAULT_BORDER_COLOR,
+    val activeBorderColor: Int = DEFAULT_ACTIVE_BORDER_COLOR,
 )
 
 const val DEFAULT_TEXT_COLOR: Int = -0x1
 const val DEFAULT_WIDGET_COLOR: Int = 0xFF30343D.toInt()
 const val DEFAULT_ACTIVE_COLOR: Int = 0xFF4068B7.toInt()
+const val DEFAULT_BORDER_COLOR: Int = 0xFF646B78.toInt()
+const val DEFAULT_ACTIVE_BORDER_COLOR: Int = 0xFF94B5FF.toInt()
 
 object PresetWidgetSettings {
     const val CHANGE_REVISION = "widget_preset_revision"
@@ -61,6 +65,8 @@ object PresetWidgetSettings {
                 identityText = json.optString("identityText", "").take(18),
                 widgetColor = json.optInt("widgetColor", DEFAULT_WIDGET_COLOR),
                 activeColor = json.optInt("activeColor", DEFAULT_ACTIVE_COLOR),
+                borderColor = json.optInt("borderColor", DEFAULT_BORDER_COLOR),
+                activeBorderColor = json.optInt("activeBorderColor", DEFAULT_ACTIVE_BORDER_COLOR),
             )
         } catch (_: Exception) {
             null
@@ -88,6 +94,8 @@ object PresetWidgetSettings {
                 .put("identityText", config.identityText.take(18))
                 .put("widgetColor", config.widgetColor)
                 .put("activeColor", config.activeColor)
+                .put("borderColor", config.borderColor)
+                .put("activeBorderColor", config.activeBorderColor)
         preferences(context).edit().putString("widget_$widgetId", json.toString()).apply()
     }
 

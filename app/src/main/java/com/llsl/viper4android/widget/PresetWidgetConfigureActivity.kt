@@ -122,6 +122,12 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                 var activeColor by remember(widgetId) {
                     mutableIntStateOf(previous?.activeColor ?: DEFAULT_ACTIVE_COLOR)
                 }
+                var borderColor by remember(widgetId) {
+                    mutableIntStateOf(previous?.borderColor ?: DEFAULT_BORDER_COLOR)
+                }
+                var activeBorderColor by remember(widgetId) {
+                    mutableIntStateOf(previous?.activeBorderColor ?: DEFAULT_ACTIVE_BORDER_COLOR)
+                }
                 var editingColor by remember { mutableStateOf<String?>(null) }
 
                 Scaffold(
@@ -157,6 +163,8 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                             identityText = identityText.trim().take(18),
                                             widgetColor = widgetColor,
                                             activeColor = activeColor,
+                                            borderColor = borderColor,
+                                            activeBorderColor = activeBorderColor,
                                         ),
                                     )
                                     setResult(
@@ -288,6 +296,8 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                         identityMode = identityMode,
                                         identityText = identityText,
                                         activeColor = activeColor,
+                                        borderColor = borderColor,
+                                        activeBorderColor = activeBorderColor,
                                     )
                                 }
 
@@ -340,10 +350,15 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                 modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                                 verticalArrangement = Arrangement.spacedBy(10.dp),
                             ) {
-                                WidgetColorSetting("Text (inactive)", textColor) { editingColor = "Text" }
-                                WidgetColorSetting("Text (active)", activeTextColor) { editingColor = "Active text" }
-                                WidgetColorSetting("Widget (inactive)", widgetColor) { editingColor = "Widget" }
-                                WidgetColorSetting("Active preset", activeColor) { editingColor = "Active" }
+                                WidgetColorMatrix(
+                                    inactiveBackground = widgetColor,
+                                    activeBackground = activeColor,
+                                    inactiveText = textColor,
+                                    activeText = activeTextColor,
+                                    inactiveBorder = borderColor,
+                                    activeBorder = activeBorderColor,
+                                    onPick = { editingColor = it },
+                                )
                             }
                         }
                     }
@@ -358,7 +373,9 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                 "Text" -> textColor
                                 "Active text" -> activeTextColor
                                 "Widget" -> widgetColor
-                                else -> activeColor
+                                "Active" -> activeColor
+                                "Border" -> borderColor
+                                else -> activeBorderColor
                             }
                         }
                         val updateColour: (Int) -> Unit = { colour ->
@@ -366,7 +383,9 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                 "Text" -> textColor = colour
                                 "Active text" -> activeTextColor = colour
                                 "Widget" -> widgetColor = colour
-                                else -> activeColor = colour
+                                "Active" -> activeColor = colour
+                                "Border" -> borderColor = colour
+                                else -> activeBorderColor = colour
                             }
                         }
                         PresetWidgetColorPicker(
@@ -399,6 +418,8 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                     activeText = if (title == "Active text") picked else activeTextColor,
                                     inactiveBackground = if (title == "Widget") picked else widgetColor,
                                     activeBackground = if (title == "Active") picked else activeColor,
+                                    inactiveBorder = if (title == "Border") picked else borderColor,
+                                    activeBorder = if (title == "Active border") picked else activeBorderColor,
                                 )
                             },
                         )
