@@ -208,12 +208,8 @@ class PresetWidgetProvider : AppWidgetProvider() {
             choices.forEachIndexed { index, choice ->
                 val preset = presets[choice.id]
                 val itemLayout =
-                    when {
-                        vertical && active == choice.id -> R.layout.widget_preset_item_vertical_active
-                        vertical -> R.layout.widget_preset_item_vertical_inactive
-                        active == choice.id -> R.layout.widget_preset_item_horizontal_active
-                        else -> R.layout.widget_preset_item_horizontal_inactive
-                    }
+                    if (vertical) R.layout.widget_preset_item_vertical
+                    else R.layout.widget_preset_item_horizontal
                 val item = RemoteViews(context.packageName, itemLayout)
                 val presetName = preset?.name ?: "Missing preset"
                 val styledName = SpannableString(presetName)
