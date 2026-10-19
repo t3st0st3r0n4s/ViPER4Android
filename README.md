@@ -68,7 +68,7 @@ The configuration screen keeps the preview visible while settings scroll. On a s
 
 ## Installation
 
-1. Download the latest APK from the [Releases](https://github.com/likelikeslike/ViPER4Android/releases)
+1. For this fork's home-screen widget, download the [widget preview APK](https://github.com/t3st0st3r0n4s/ViPER4Android/releases/tag/v2.1.1-widget-preview.1). For the unmodified app, use the [upstream releases](https://github.com/likelikeslike/ViPER4Android/releases).
 2. Install the APK
 3. Flash the Magisk module from [ViPERFX_RE](https://github.com/likelikeslike/ViPERFX_RE) (or the AIDL variant)
 4. Reboot
