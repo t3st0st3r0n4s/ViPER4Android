@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -130,6 +131,7 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                     mutableIntStateOf(previous?.activeBorderColor ?: DEFAULT_ACTIVE_BORDER_COLOR)
                 }
                 var editingColor by remember { mutableStateOf<String?>(null) }
+                var previewVisible by remember(widgetId) { mutableStateOf(true) }
 
                 Scaffold(
                     bottomBar = {
@@ -179,24 +181,37 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                         }
                     },
                 ) { contentPadding ->
-                    Column(modifier = Modifier.fillMaxSize().padding(contentPadding)) {
+                    BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(contentPadding)) {
+                        // Reserve room for the settings in landscape and split-screen windows.
+                        val previewMaxHeight = minOf(192.dp, maxHeight * 0.25f)
+                        Column(modifier = Modifier.fillMaxSize()) {
                         Column(
                             modifier = Modifier.fillMaxWidth()
                                 .background(MaterialTheme.colorScheme.surface)
                                 .padding(horizontal = 16.dp, vertical = 8.dp),
                             verticalArrangement = Arrangement.spacedBy(6.dp),
                         ) {
-                            Text("Preset widget", style = MaterialTheme.typography.titleLarge)
-                            if (chosen.isNotEmpty()) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Text("Preset widget", style = MaterialTheme.typography.titleLarge)
+                                if (chosen.isNotEmpty()) {
+                                    TextButton(onClick = { previewVisible = !previewVisible }) {
+                                        Text(if (previewVisible) "Hide preview" else "Show preview")
+                                    }
+                                }
+                            }
+                            if (chosen.isNotEmpty() && previewVisible) {
                                 Text(
                                     "Live preview — long-press and drag to reorder",
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
-                                // Keep large vertical layouts accessible without occupying the entire screen.
                                 Box(
                                     modifier = Modifier.fillMaxWidth()
-                                        .heightIn(max = 192.dp)
+                                        .heightIn(max = previewMaxHeight)
                                         .verticalScroll(rememberScrollState()),
                                 ) {
                                     PresetWidgetPreview(
@@ -219,7 +234,7 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                         activeBorderColor = activeBorderColor,
                                     )
                                 }
-                            } else {
+                            } else if (chosen.isEmpty()) {
                                 Text(
                                     "Select presets below to preview.",
                                     style = MaterialTheme.typography.bodySmall,
@@ -382,6 +397,7 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                     onPick = { editingColor = it },
                                 )
                             }
+                        }
                         }
                         }
                     }
