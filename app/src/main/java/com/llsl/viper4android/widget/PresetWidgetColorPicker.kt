@@ -3,6 +3,7 @@ package com.llsl.viper4android.widget
 import android.graphics.Color as AndroidColor
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -74,8 +75,8 @@ private fun parseHex(value: String): Int? {
 }
 
 @Composable
-private fun CheckerboardSwatch(color: Int, modifier: Modifier = Modifier) {
-    Box(modifier.clip(RoundedCornerShape(8.dp))) {
+private fun CheckerboardSwatch(color: Int, modifier: Modifier = Modifier, radiusDp: Int = 8) {
+    Box(modifier.clip(RoundedCornerShape(radiusDp.dp))) {
         Canvas(Modifier.matchParentSize()) {
             val step = 10.dp.toPx()
             repeat(ceil(size.height / step).toInt()) { y ->
@@ -98,6 +99,8 @@ fun WidgetPickerLivePreview(
     orientation: String,
     gapDp: Int,
     outerInsetDp: Int,
+    cornerRadiusDp: Int,
+    borderWidthDp: Int,
     textSizeSp: Int,
     textWeight: String,
     identity: String,
@@ -127,6 +130,8 @@ fun WidgetPickerLivePreview(
                     showViperIcon = showViperIcon,
                     textSizeSp = textSizeSp,
                     textWeight = textWeight,
+                    cornerRadiusDp = cornerRadiusDp,
+                    borderWidthDp = borderWidthDp,
                     inactiveText = inactiveText,
                     activeText = activeText,
                     inactiveBackground = inactiveBackground,
@@ -148,6 +153,8 @@ fun WidgetPickerLivePreview(
                     showViperIcon = showViperIcon,
                     textSizeSp = textSizeSp,
                     textWeight = textWeight,
+                    cornerRadiusDp = cornerRadiusDp,
+                    borderWidthDp = borderWidthDp,
                     inactiveText = inactiveText,
                     activeText = activeText,
                     inactiveBackground = inactiveBackground,
@@ -167,6 +174,8 @@ private fun WidgetPickerPreviewButton(
     showViperIcon: Boolean,
     textSizeSp: Int,
     textWeight: String,
+    cornerRadiusDp: Int,
+    borderWidthDp: Int,
     inactiveText: Int,
     activeText: Int,
     inactiveBackground: Int,
@@ -175,8 +184,14 @@ private fun WidgetPickerPreviewButton(
 ) {
     val foreground = if (active) activeText else inactiveText
     val background = if (active) activeBackground else inactiveBackground
-    Box(modifier.heightIn(min = 56.dp)) {
-        CheckerboardSwatch(background, Modifier.matchParentSize())
+    Box(
+        modifier.heightIn(min = 56.dp).border(
+            borderWidthDp.dp,
+            Color(if (active) 0xFF94B5FF else 0xFF646B78),
+            RoundedCornerShape(cornerRadiusDp.dp),
+        ),
+    ) {
+        CheckerboardSwatch(background, Modifier.matchParentSize(), cornerRadiusDp)
         Text(
             name,
             modifier = Modifier.align(Alignment.Center).padding(vertical = 4.dp, horizontal = 4.dp),

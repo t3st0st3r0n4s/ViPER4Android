@@ -4,7 +4,6 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
-import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.text.SpannableString
 import android.text.Spanned
@@ -18,6 +17,7 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
 import com.llsl.viper4android.R
+import com.llsl.viper4android.data.ActivePresetSelection
 import com.llsl.viper4android.data.model.Preset
 import com.llsl.viper4android.data.repository.ViperRepository
 import com.llsl.viper4android.service.ViperService
@@ -138,7 +138,7 @@ class PresetWidgetProvider : AppWidgetProvider() {
             )
             views.addView(R.id.widget_preset_container, empty)
         } else {
-            val active = PresetWidgetSettings.activePresetId(context)
+            val active = ActivePresetSelection.activePresetId(context)
             val gapDp = config?.gapDp ?: 4
             val gapPx = (context.resources.displayMetrics.density * gapDp).toInt()
             choices.forEachIndexed { index, choice ->
@@ -194,18 +194,33 @@ class PresetWidgetProvider : AppWidgetProvider() {
                     0,
                     0,
                 )
+                val selected = active == choice.id
                 val backgroundColor =
-                    if (active == choice.id) config?.activeColor ?: DEFAULT_ACTIVE_COLOR
+                    if (selected) config?.activeColor ?: DEFAULT_ACTIVE_COLOR
                     else config?.widgetColor ?: DEFAULT_WIDGET_COLOR
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    item.setColorStateList(
-                        R.id.widget_preset_label,
-                        "setBackgroundTintList",
-                        ColorStateList.valueOf(backgroundColor),
+                    val borderColor = if (selected) 0xFF94B5FF.toInt() else 0xFF646B78.toInt()
+                    val radiusDp = (config?.cornerRadiusDp ?: 10).coerceIn(0, 24)
+                    val borderDp = (config?.borderWidthDp ?: 1).coerceIn(0, 4)
+                    item.setInt(R.id.widget_preset_frame, "setBackgroundColor", borderColor)
+                    item.setInt(R.id.widget_preset_face, "setBackgroundColor", backgroundColor)
+                    item.setBoolean(R.id.widget_preset_frame, "setClipToOutline", true)
+                    item.setBoolean(R.id.widget_preset_face, "setClipToOutline", true)
+                    item.setViewOutlinePreferredRadius(
+                        R.id.widget_preset_frame, radiusDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP,
                     )
-                } else {
-                    // Android < 12 has no dynamic RemoteViews ColorStateList setter.
-                    item.setInt(R.id.widget_preset_label, "setBackgroundColor", backgroundColor)
+                    item.setViewOutlinePreferredRadius(
+                        R.id.widget_preset_face, (radiusDp - borderDp).coerceAtLeast(0).toFloat(),
+                        TypedValue.COMPLEX_UNIT_DIP,
+                    )
+                    listOf(
+                        RemoteViews.MARGIN_LEFT, RemoteViews.MARGIN_RIGHT,
+                        RemoteViews.MARGIN_TOP, RemoteViews.MARGIN_BOTTOM,
+                    ).forEach { side ->
+                        item.setViewLayoutMargin(
+                            R.id.widget_preset_face, side, borderDp.toFloat(), TypedValue.COMPLEX_UNIT_DIP,
+                        )
+                    }
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     // Margins participate in LinearLayout weight distribution, so every

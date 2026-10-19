@@ -5,13 +5,19 @@
     android:layout_height="0dp"
     android:layout_weight="1">
     <FrameLayout
+        android:id="@+id/widget_preset_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@drawable/widget_preset_active">
+        <FrameLayout
+            android:id="@+id/widget_preset_face"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="1dp">
         <TextView
         android:id="@+id/widget_preset_label"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/widget_preset_active"
         android:gravity="center"
         android:ellipsize="end"
         android:singleLine="true"
@@ -42,5 +48,6 @@
             android:paddingTop="2dp"
             android:textSize="9sp"
             android:textColor="#FFFFFFFF" />
+        </FrameLayout>
     </FrameLayout>
 </LinearLayout>

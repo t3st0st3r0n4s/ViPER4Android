@@ -7,6 +7,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.foundation.layout.size
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,6 +51,8 @@ fun PresetWidgetPreview(
     vertical: Boolean,
     gapDp: Int,
     outerInsetDp: Int,
+    cornerRadiusDp: Int,
+    borderWidthDp: Int,
     textColor: Int,
     textSizeSp: Int,
     textWeight: String,
@@ -77,6 +81,9 @@ fun PresetWidgetPreview(
                         textSizeSp = textSizeSp,
                         textWeight = textWeight,
                         backgroundColor = if (index == 0) activeColor else widgetColor,
+                        borderColor = if (index == 0) 0xFF94B5FF.toInt() else 0xFF646B78.toInt(),
+                        cornerRadiusDp = cornerRadiusDp,
+                        borderWidthDp = borderWidthDp,
                         identity = if (identityMode == "custom") identityText.trim() else "ViPER",
                         showViperIcon = identityMode != "custom",
                         modifier = Modifier.fillMaxWidth(),
@@ -101,6 +108,9 @@ fun PresetWidgetPreview(
                         textSizeSp = textSizeSp,
                         textWeight = textWeight,
                         backgroundColor = if (index == 0) activeColor else widgetColor,
+                        borderColor = if (index == 0) 0xFF94B5FF.toInt() else 0xFF646B78.toInt(),
+                        cornerRadiusDp = cornerRadiusDp,
+                        borderWidthDp = borderWidthDp,
                         identity = if (identityMode == "custom") identityText.trim() else "ViPER",
                         showViperIcon = identityMode != "custom",
                         modifier = Modifier.weight(1f),
@@ -122,6 +132,9 @@ private fun PreviewPresetButton(
     textSizeSp: Int,
     textWeight: String,
     backgroundColor: Int,
+    borderColor: Int,
+    cornerRadiusDp: Int,
+    borderWidthDp: Int,
     identity: String,
     showViperIcon: Boolean,
     modifier: Modifier,
@@ -179,7 +192,11 @@ private fun PreviewPresetButton(
                     )
                 }.background(
                     Color(backgroundColor),
-                    MaterialTheme.shapes.medium,
+                    RoundedCornerShape(cornerRadiusDp.dp),
+                ).border(
+                    borderWidthDp.dp,
+                    Color(borderColor),
+                    RoundedCornerShape(cornerRadiusDp.dp),
                 ),
         contentAlignment = Alignment.Center,
     ) {

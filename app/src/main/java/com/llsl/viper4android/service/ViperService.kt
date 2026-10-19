@@ -31,6 +31,8 @@ import com.llsl.viper4android.viper.HidlTransport
 import com.llsl.viper4android.viper.ParamValue
 import com.llsl.viper4android.viper.ViperParams
 import com.llsl.viper4android.viper.ViperTransport
+import com.llsl.viper4android.data.ActivePresetSelection
+import com.llsl.viper4android.widget.PresetWidgetProvider
 import com.llsl.viper4android.widget.PresetWidgetSettings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -225,9 +227,14 @@ class ViperService : LifecycleService() {
     private var currentServiceDeviceId: String = AudioDevice.ID_SPEAKER
 
     private fun startAudioOutputMonitor() {
+        if (audioOutputDetector != null) return
         val detector = AudioOutputDetector(this)
         audioOutputDetector = detector
         currentServiceDeviceId = detector.activeDevice.value.id
+        lifecycleScope.launch {
+            ActivePresetSelection.selectDevice(this@ViperService, detector.activeDevice.value.id)
+            PresetWidgetProvider.refreshAll(this@ViperService)
+        }
         lifecycleScope.launch {
             detector.activeDevice.collect { device ->
                 if (device.id != currentServiceDeviceId) {
@@ -267,7 +274,8 @@ class ViperService : LifecycleService() {
                 s
             }
         applyState(state, masterEnabled)
-        PresetWidgetSettings.markActive(this, null)
+        ActivePresetSelection.selectDevice(this, device.id)
+        PresetWidgetProvider.refreshAll(this)
     }
 
     private suspend fun dispatchFullStateToEffect() {
@@ -319,6 +327,7 @@ class ViperService : LifecycleService() {
                             loadEffectStateFromPrefs(repository),
                         )
                     saveEffectPrefs(repository, state)
+                    startAudioOutputMonitor()
                     val device = audioOutputDetector?.activeDevice?.value
                     if (device != null) {
                         val previous = repository.getDeviceSettings(device.id)
@@ -335,7 +344,11 @@ class ViperService : LifecycleService() {
                     lastUiState = state
                     bootMasterEnabled = state.masterEnable
                     applyState(state, state.masterEnable)
-                    PresetWidgetSettings.markActive(this@ViperService, presetId)
+                    val deviceId = device?.id ?: currentServiceDeviceId
+                    ActivePresetSelection.selectDevice(this@ViperService, deviceId)
+                    if (ActivePresetSelection.setPreset(this@ViperService, deviceId, presetId)) {
+                        PresetWidgetProvider.refreshAll(this@ViperService)
+                    }
                     repository.setStringPreference(
                         PresetWidgetSettings.CHANGE_REVISION,
                         System.nanoTime().toString(),

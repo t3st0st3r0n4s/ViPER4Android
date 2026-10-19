@@ -11,6 +11,8 @@ data class WidgetConfiguration(
     val orientation: String = "horizontal",
     val gapDp: Int = 4,
     val outerInsetDp: Int = 0,
+    val cornerRadiusDp: Int = 10,
+    val borderWidthDp: Int = 1,
     val textColor: Int = DEFAULT_TEXT_COLOR,
     val presetTextSizeSp: Int = 13,
     val presetTextWeight: String = "normal",
@@ -28,7 +30,6 @@ const val DEFAULT_ACTIVE_COLOR: Int = 0xFF4068B7.toInt()
 object PresetWidgetSettings {
     const val CHANGE_REVISION = "widget_preset_revision"
     private const val STORAGE = "viper_preset_widgets"
-    private const val ACTIVE_ID = "active_preset_id"
 
     private fun preferences(context: Context) =
         context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE)
@@ -49,6 +50,8 @@ object PresetWidgetSettings {
                 orientation = json.optString("orientation", "horizontal"),
                 gapDp = json.optInt("gapDp", 4).coerceIn(0, 96),
                 outerInsetDp = json.optInt("outerInsetDp", 0).coerceIn(0, 64),
+                cornerRadiusDp = json.optInt("cornerRadiusDp", 10).coerceIn(0, 24),
+                borderWidthDp = json.optInt("borderWidthDp", 1).coerceIn(0, 4),
                 textColor = json.optInt("textColor", DEFAULT_TEXT_COLOR),
                 presetTextSizeSp = json.optInt("presetTextSizeSp", 13).coerceIn(10, 30),
                 presetTextWeight = json.optString("presetTextWeight", "normal")
@@ -75,6 +78,8 @@ object PresetWidgetSettings {
                 .put("orientation", config.orientation)
                 .put("gapDp", config.gapDp.coerceIn(0, 96))
                 .put("outerInsetDp", config.outerInsetDp.coerceIn(0, 64))
+                .put("cornerRadiusDp", config.cornerRadiusDp.coerceIn(0, 24))
+                .put("borderWidthDp", config.borderWidthDp.coerceIn(0, 4))
                 .put("textColor", config.textColor)
                 .put("presetTextSizeSp", config.presetTextSizeSp.coerceIn(10, 30))
                 .put("presetTextWeight", config.presetTextWeight)
@@ -92,14 +97,4 @@ object PresetWidgetSettings {
         }.apply()
     }
 
-    fun activePresetId(context: Context): Long? {
-        val id = preferences(context).getLong(ACTIVE_ID, -1L)
-        return id.takeIf { it > 0 }
-    }
-
-    fun markActive(context: Context, presetId: Long?) {
-        if (activePresetId(context) == presetId) return
-        preferences(context).edit().putLong(ACTIVE_ID, presetId ?: -1L).apply()
-        PresetWidgetProvider.refreshAll(context)
-    }
 }

@@ -92,6 +92,12 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                 var outerInset by remember(widgetId) {
                     mutableFloatStateOf((previous?.outerInsetDp ?: 0).toFloat())
                 }
+                var cornerRadius by remember(widgetId) {
+                    mutableFloatStateOf((previous?.cornerRadiusDp ?: 10).toFloat())
+                }
+                var borderWidth by remember(widgetId) {
+                    mutableFloatStateOf((previous?.borderWidthDp ?: 1).toFloat())
+                }
                 var textColor by remember(widgetId) {
                     mutableIntStateOf(previous?.textColor ?: DEFAULT_TEXT_COLOR)
                 }
@@ -141,6 +147,8 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                             orientation = orientation,
                                             gapDp = spacing.roundToInt(),
                                             outerInsetDp = outerInset.roundToInt(),
+                                            cornerRadiusDp = cornerRadius.roundToInt(),
+                                            borderWidthDp = borderWidth.roundToInt(),
                                             textColor = textColor,
                                             presetTextSizeSp = presetTextSize.roundToInt(),
                                             presetTextWeight = presetTextWeight,
@@ -270,6 +278,8 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                         vertical = orientation == "vertical",
                                         gapDp = spacing.roundToInt(),
                                         outerInsetDp = outerInset.roundToInt(),
+                                        cornerRadiusDp = cornerRadius.roundToInt(),
+                                        borderWidthDp = borderWidth.roundToInt(),
                                         textColor = textColor,
                                         textSizeSp = presetTextSize.roundToInt(),
                                         textWeight = presetTextWeight,
@@ -285,6 +295,18 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                 Slider(value = spacing, onValueChange = { spacing = it }, valueRange = 0f..96f)
                                 Text("Outside inset: ${outerInset.roundToInt()} dp")
                                 Slider(value = outerInset, onValueChange = { outerInset = it }, valueRange = 0f..64f)
+                                Text("Corner radius: ${cornerRadius.roundToInt()} dp")
+                                Slider(
+                                    value = cornerRadius,
+                                    onValueChange = { cornerRadius = it },
+                                    valueRange = 0f..24f, steps = 23,
+                                )
+                                Text("Border width: ${borderWidth.roundToInt()} dp")
+                                Slider(
+                                    value = borderWidth,
+                                    onValueChange = { borderWidth = it },
+                                    valueRange = 0f..4f, steps = 3,
+                                )
                             }
                         }
 
@@ -367,6 +389,8 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                     orientation = orientation,
                                     gapDp = spacing.roundToInt(),
                                     outerInsetDp = outerInset.roundToInt(),
+                                    cornerRadiusDp = cornerRadius.roundToInt(),
+                                    borderWidthDp = borderWidth.roundToInt(),
                                     textSizeSp = presetTextSize.roundToInt(),
                                     textWeight = presetTextWeight,
                                     identity = if (identityMode == "custom") identityText.trim() else "ViPER",
