@@ -42,12 +42,7 @@ class AudioSessionMonitor(
         FileLogger.i(TAG, "Starting playback monitor")
         audioManager.registerAudioPlaybackCallback(playbackCallback, mainHandler)
         registered = true
-        handlePlaybackChange()
-    }
-
-    /** Recheck active playback after a service start, including root granted since boot. */
-    fun refresh() {
-        if (registered) handlePlaybackChange()
+        resolveFromDumpsys()
     }
 
     fun stop() {
@@ -84,7 +79,6 @@ class AudioSessionMonitor(
             } ?: return
 
         mainHandler.post {
-            if (!registered) return@post
             val discoveredPiids = discovered.keys
             val currentPiids = activePiids.keys.toSet()
 

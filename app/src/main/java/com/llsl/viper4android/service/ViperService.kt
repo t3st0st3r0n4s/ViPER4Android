@@ -295,7 +295,6 @@ class ViperService : LifecycleService() {
         when (intent?.action) {
             ACTION_START -> {
                 FileLogger.i("Service", "Service started")
-                sessionMonitor?.refresh()
             }
 
             ACTION_STOP -> {
