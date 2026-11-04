@@ -346,7 +346,7 @@ class PresetWidgetConfigureActivity : ComponentActivity() {
                                 Slider(
                                     value = cornerRadius,
                                     onValueChange = { cornerRadius = it },
-                                    valueRange = 0f..24f, steps = 23,
+                                    valueRange = 0f..32f, steps = 31,
                                 )
                                 Text("Border width: ${borderWidth.roundToInt()} dp")
                                 Slider(

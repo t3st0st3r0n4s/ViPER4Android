@@ -187,7 +187,7 @@ class PresetWidgetProvider : AppWidgetProvider() {
                 (heightDp - 2 * insetDp - (if (vertical) gapDp * (choices.size - 1) else 0)).coerceAtLeast(1)
             val buttonWidthDp = availableWidthDp.toFloat() / (if (vertical) 1 else choices.size)
             val buttonHeightDp = availableHeightDp.toFloat() / (if (vertical) choices.size else 1)
-            val radiusDp = (config?.cornerRadiusDp ?: 10).coerceIn(0, 24)
+            val radiusDp = (config?.cornerRadiusDp ?: 10).coerceIn(0, 32)
             val borderDp = (config?.borderWidthDp ?: 1).coerceIn(0, 4)
             val normalBackground = makePresetLayer(
                 density, buttonWidthDp, buttonHeightDp,

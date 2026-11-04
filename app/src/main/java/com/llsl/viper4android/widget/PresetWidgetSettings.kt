@@ -54,7 +54,7 @@ object PresetWidgetSettings {
                 orientation = json.optString("orientation", "horizontal"),
                 gapDp = json.optInt("gapDp", 4).coerceIn(0, 96),
                 outerInsetDp = json.optInt("outerInsetDp", 0).coerceIn(0, 64),
-                cornerRadiusDp = json.optInt("cornerRadiusDp", 10).coerceIn(0, 24),
+                cornerRadiusDp = json.optInt("cornerRadiusDp", 10).coerceIn(0, 32),
                 borderWidthDp = json.optInt("borderWidthDp", 1).coerceIn(0, 4),
                 textColor = json.optInt("textColor", DEFAULT_TEXT_COLOR),
                 presetTextSizeSp = json.optInt("presetTextSizeSp", 13).coerceIn(10, 30),
@@ -84,7 +84,7 @@ object PresetWidgetSettings {
                 .put("orientation", config.orientation)
                 .put("gapDp", config.gapDp.coerceIn(0, 96))
                 .put("outerInsetDp", config.outerInsetDp.coerceIn(0, 64))
-                .put("cornerRadiusDp", config.cornerRadiusDp.coerceIn(0, 24))
+                .put("cornerRadiusDp", config.cornerRadiusDp.coerceIn(0, 32))
                 .put("borderWidthDp", config.borderWidthDp.coerceIn(0, 4))
                 .put("textColor", config.textColor)
                 .put("presetTextSizeSp", config.presetTextSizeSp.coerceIn(10, 30))
