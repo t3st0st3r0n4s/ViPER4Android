@@ -34,8 +34,14 @@ jobs:
         run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
       - name: Report exact APK byte size
         run: stat -c 'APK %n %s bytes' app/build/outputs/apk/release/*.apk
+      - name: Resolve application version
+        id: app_version
+        run: |
+          version="$(sed -nE 's/^[[:space:]]*versionName[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/p' app/build.gradle.kts)"
+          test -n "$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
-          name: ViPER4Android-2.1.1-preset-widget-release-test
+          name: ViPER4Android-${{ steps.app_version.outputs.version }}-preset-widget-release-test
           path: app/build/outputs/apk/release/*.apk
           if-no-files-found: error
