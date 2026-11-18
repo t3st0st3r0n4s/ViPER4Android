@@ -176,7 +176,7 @@ fun WidgetPickerLivePreview(
         return
     }
 
-    // Match the configuration preview: Auto is shown horizontally until the host sizes it.
+    // Auto uses a horizontal layout in the colour-picker preview.
     val vertical = orientation == "vertical"
     if (vertical) {
         Column(

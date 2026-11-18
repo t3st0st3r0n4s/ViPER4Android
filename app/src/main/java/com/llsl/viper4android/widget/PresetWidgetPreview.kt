@@ -63,7 +63,6 @@ fun PresetWidgetPreview(
     identityMode: String,
     identityText: String,
 ) {
-    // One preview is also the ordering control: no separate duplicate preset list.
     val entries = chosen.toList()
     if (vertical) {
         Column(

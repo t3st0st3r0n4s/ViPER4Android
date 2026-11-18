@@ -58,7 +58,7 @@ It highlights the selected preset for the current audio output device; changing 
 
 1. Create or import your presets in ViPER4Android.
 2. From your launcher's **Widgets** menu, add the **ViPER presets** widget and choose which presets to display.
-3. Long-press and drag the buttons in the live preview to change their order. Set **Horizontal**, **Vertical**, or **Auto** layout, then customise the widget label, spacing, corner radius, border width, text size and weight.
+3. Long-press and drag the buttons in the live preview to change their order. Set **Horizontal**, **Vertical**, or **Auto** layout, then customise the widget label, spacing, corner radius (0–32dp), border width, text size and weight.
 4. Use **Colours** to set active and inactive background, border and text colours independently, including transparency.
 5. Tap **Save widget**. Tap a preset button on your home screen to apply it.
 
@@ -68,7 +68,7 @@ The configuration screen keeps the preview visible while settings scroll. On a s
 
 ## Installation
 
-1. For this fork's home-screen widget, download the [widget preview APK](https://github.com/t3st0st3r0n4s/ViPER4Android/releases/tag/v2.1.1-widget-preview.1). For the unmodified app, use the [upstream releases](https://github.com/likelikeslike/ViPER4Android/releases).
+1. For this fork's home-screen widget, download the [widget preview APK](https://github.com/t3st0st3r0n4s/ViPER4Android/releases/tag/v2.1.2-widget-preview.1). For the unmodified app, use the [upstream releases](https://github.com/likelikeslike/ViPER4Android/releases).
 2. Install the APK
 3. Flash the Magisk module from [ViPERFX_RE](https://github.com/likelikeslike/ViPERFX_RE) (or the AIDL variant)
 4. Reboot

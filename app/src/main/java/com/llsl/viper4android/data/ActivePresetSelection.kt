@@ -2,11 +2,7 @@ package com.llsl.viper4android.data
 
 import android.content.Context
 
-/**
- * App-owned preset selection. Audio settings already belong to each device; this only
- * remembers which saved preset was last applied, without changing upstream DB schemas.
- * The widget reads this state but never writes it.
- */
+/** Tracks the active preset independently for each audio output device. */
 object ActivePresetSelection {
     private const val STORAGE = "viper_device_preset_selection"
     private const val CURRENT_DEVICE = "current_audio_device"
