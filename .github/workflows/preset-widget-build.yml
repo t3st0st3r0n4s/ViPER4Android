@@ -3,13 +3,14 @@ name: Preset widget build
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - '.github/workflows/publish-widget-preview.yml'
 
 permissions:
   contents: read
 
 jobs:
   release-test-apk:
-    if: ${{ !startsWith(github.event.head_commit.message, 'release: publish widget preview') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
