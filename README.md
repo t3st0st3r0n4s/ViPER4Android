@@ -54,7 +54,7 @@ This fork extends [the upstream project](https://github.com/likelikeslike/ViPER4
 ## Preset Widget (fork extension)
 
 The widget applies saved ViPER4Android presets directly from your launcher without opening the app.
-It highlights the selected preset for the current audio output device; changing effect settings manually clears that selection.
+It highlights presets whose saved effect settings match the current audio output device, including when settings are changed manually.
 
 1. Create or import your presets in ViPER4Android.
 2. From your launcher's **Widgets** menu, add the **ViPER presets** widget and choose which presets to display.
