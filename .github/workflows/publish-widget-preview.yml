@@ -24,16 +24,16 @@ jobs:
   publish:
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      github.event.head_commit.message == 'release: publish widget preview v2.1.2'
+      startsWith(github.event.head_commit.message, 'release: publish widget preview')
     runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: write
     env:
       GH_TOKEN: ${{ github.token }}
-      BUILD_RUN_ID: ${{ inputs.build_run_id || '44275592538' }}
-      SOURCE_SHA: ${{ inputs.source_sha || '95797139fd4b9c7fda5e0eda8ea54eabcbc2cce8' }}
-      RELEASE_TAG: ${{ inputs.tag || 'v2.1.2-widget-preview.1' }}
+      BUILD_RUN_ID: ${{ inputs.build_run_id || '44568324215' }}
+      SOURCE_SHA: ${{ inputs.source_sha || 'c9e5d176e571a5da99864cec8bd17e9297ba35a6' }}
+      RELEASE_TAG: ${{ inputs.tag || 'v2.1.2-widget-preview.2' }}
       ARTIFACT_NAME: ViPER4Android-2.1.2-preset-widget-release-test
     steps:
       - name: Verify previously built release-test artifact
@@ -54,32 +54,19 @@ jobs:
         run: |
           set -euo pipefail
           cat > release-notes.md <<'EOF'
-          ## ViPER4Android 2.1.2 — Preset Widget Preview 1
+          ## Changelog — Preview 2
 
-          Fork of [likelikeslike/ViPER4Android](https://github.com/likelikeslike/ViPER4Android) with a configurable home-screen preset launcher.
+          - Active preset highlight now matches actual effect settings, not the last selected preset.
+          - Highlight automatically returns when settings match a saved preset again.
+          - Corrected highlighting across audio-device changes.
+          - Flushes pending widget refresh when closing settings.
 
-          ### Upstream 2.1.2 fixes
-          - Restore the selected audio-device profile correctly after boot
-          - Apply DDC and Convolver to newly opened Per-App audio sessions
-
-          ### Widget features
-          - Apply saved ViPER presets from the launcher without opening the app
-          - Select and drag presets into the preferred order with haptic feedback
-          - Horizontal, vertical, or automatic layout; spacing, insets, corners (up to 32dp), and borders
-          - Independent active/inactive colours and transparency, preset text size and weight, and optional widget labels
-          - Sticky live preview, with adaptive height and hide/show control for landscape
-          - Device-aware preset highlighting, refreshed after app-side preset changes
-
-          ### Installation and signing
-          This APK is a **preview build**, minified and signed with a temporary CI debug key. It is **not signed with a permanent release certificate** and may not install over an existing ViPER4Android APK. Back up settings before replacing your existing app. You still need a compatible ViPER4Android DSP driver/module.
-
-          **Source commit:** 95797139fd4b9c7fda5e0eda8ea54eabcbc2cce8
-          **Verified CI build:** https://github.com/t3st0st3r0n4s/ViPER4Android/actions/runs/44275592538
-          **Device qualification:** Full end-to-end BOARD acceptance not established by CI.
+          **APK source:** c9e5d176e571a5da99864cec8bd17e9297ba35a6
+          **Verified build:** https://github.com/t3st0st3r0n4s/ViPER4Android/actions/runs/44568324215
           EOF
           gh release create "$RELEASE_TAG" "dist/ViPER4Android-$RELEASE_TAG.apk" dist/SHA256SUMS.txt \
             --repo "$GITHUB_REPOSITORY" \
-            --target "$SOURCE_SHA" \
-            --title "ViPER4Android 2.1.2 — Preset Widget Preview 1" \
+            --target "$GITHUB_SHA" \
+            --title "ViPER4Android 2.1.2 — Preset Widget Preview 2" \
             --notes-file release-notes.md \
             --prerelease
